@@ -151,6 +151,8 @@ const firebaseConfig = {
 };
 const LOGIN_PAGE = "heineken-pro-v9.html";
 const SIGNUP_PAGE = "heineken-pro-v9.html";
+/* Adresse publique du site (ex. "https://www.mondomaine.com/"). Si elle est vide, le lien reprend l'adresse du navigateur. */
+const PUBLIC_SITE = "";
 const LEVEL_PCT = [10, 5, 2];
 
 const app = initializeApp(firebaseConfig);
@@ -215,9 +217,10 @@ function statsHtml(st) {
 
 function showCode(code, stats) {
   // Lien construit à partir de l'adresse réelle de la page dans le navigateur (domaine + dossier)
-  const here = new URL(window.location.href);
-  here.search = ""; here.hash = "";
-  const link = new URL(SIGNUP_PAGE, here.href).href + "?ref=" + encodeURIComponent(code);
+  // Le lien reprend l'adresse du navigateur sans le nom du fichier : domaine + dossier + ?ref=CODE
+  const here = new URL(PUBLIC_SITE || window.location.href);
+  const base = here.origin + here.pathname.replace(/[^/]*$/, "");
+  const link = base + "?ref=" + encodeURIComponent(code);
   const msg = `Rejoignez Là Boissons Heineken avec mon code de parrainage ${code} : ${link}`;
   $("content").innerHTML = `
     <div class="code"><div><div class="c">Votre code</div><div class="v">${esc(code)}</div></div></div>

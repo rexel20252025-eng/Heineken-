@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Heineken — Recharge</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#0d2a18;min-height:100vh;background:radial-gradient(circle at 15% 0%,#1fa452 0%,transparent 45%),linear-gradient(170deg,#00782a 0%,#00602a 60%,#004a22 100%);background-attachment:fixed}
+.app{max-width:400px;margin:0 auto;padding:18px 16px 40px}
+.bar{display:flex;align-items:center;justify-content:space-between;color:#fff;margin-bottom:14px}
+.bar .back{color:#fff;text-decoration:none;font-size:13px;font-weight:700;opacity:.9;display:flex;align-items:center;gap:6px;cursor:pointer;background:none;border:0}
+.bar .back svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.bar .brand{font-size:14px;font-weight:900;letter-spacing:2.5px}
+.bar .brand span{color:#ff5a5f}
+.steps{display:flex;align-items:center;gap:8px;margin:4px 0 16px;color:#fff}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;opacity:.6}
+.step i{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:900}
+.step.on{opacity:1}
+.step.on i{background:#ffd76a;color:#3d2500;box-shadow:0 0 0 4px rgba(255,215,106,.25)}
+.step.done{opacity:1}
+.step.done i{background:#fff;color:#00782a}
+.sline{flex:1;height:2px;background:rgba(255,255,255,.25);margin-top:-18px}
+.sheet{background:#fff;border-radius:24px;padding:18px;box-shadow:0 18px 40px rgba(0,0,0,.25);margin-bottom:14px}
+.label{font-size:12px;font-weight:800;color:#4b6353;margin:2px 0 10px;letter-spacing:.2px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.tile{position:relative;border:1.5px solid #e2ece6;border-radius:16px;padding:12px 10px;background:#fff;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;transition:border-color .2s,box-shadow .2s,transform .15s;font-family:inherit}
+.tile:active{transform:scale(.98)}
+.tile.on{border-color:#00782a;box-shadow:0 0 0 3px rgba(0,120,42,.14)}
+.tile.on::after{content:"✓";position:absolute;right:9px;top:8px;width:18px;height:18px;border-radius:50%;background:#00782a;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.logo{width:40px;height:40px;border-radius:12px;background:#f3f7f4;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 40px}
+.logo img{max-width:80%;max-height:80%;object-fit:contain}
+.logo i{font-style:normal;font-size:11px;font-weight:900;color:#00602a}
+.tname{font-size:13px;font-weight:900;color:#0d2a18}
+.tsub{font-size:10px;color:#6b8070;font-weight:700}
+.amt-tile{justify-content:center;flex-direction:column;gap:2px;padding:14px 8px}
+.amt-tile b{font-size:16px;font-weight:900;color:#0d2a18}
+.amt-tile small{font-size:10px;color:#6b8070;font-weight:700}
+.amt-tile.on b{color:#00782a}
+.summary{background:linear-gradient(135deg,#ffe9a0,#ffd76a 45%,#f5b82e);border-radius:20px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;color:#3d2500;margin-bottom:14px;box-shadow:0 12px 24px rgba(245,184,46,.35)}
+.summary .k{font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;opacity:.8}
+.summary .v{font-size:22px;font-weight:900;margin-top:2px}
+.summary .o{font-size:12px;font-weight:800;text-align:right}
+.btn{width:100%;padding:16px;border:0;border-radius:16px;font-size:15px;font-weight:900;letter-spacing:.3px;color:#fff;background:linear-gradient(135deg,#00782a,#25b96a);box-shadow:0 12px 24px rgba(0,120,42,.35);cursor:pointer;transition:transform .15s,opacity .2s}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.45;cursor:default;box-shadow:none}
+.secure{display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;font-size:11px;font-weight:700;opacity:.85;margin-top:12px}
+.secure svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.err{min-height:18px;font-size:12px;font-weight:800;color:#d71920;text-align:center;margin-bottom:8px}
+.err.ok{color:#00782a}
+.hero{text-align:center;padding:6px 0 4px}
+.hero .k{font-size:11px;font-weight:800;color:#6b8070;letter-spacing:.6px;text-transform:uppercase}
+.hero .big{font-size:36px;font-weight:900;color:#0d2a18;margin-top:4px;letter-spacing:.3px}
+.hero .big span{font-size:18px;color:#00782a}
+.chip{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:6px 12px;border-radius:999px;background:#f0f7f2;font-size:12px;font-weight:800;color:#00602a}
+.chip .logo{width:24px;height:24px;flex:0 0 24px;border-radius:8px}
+.chip .logo i{font-size:8px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-top:1px dashed #dbe6df;font-size:13px}
+.row span{color:#6b8070;font-weight:700}
+.row b{font-weight:900}
+.dep{margin-top:6px;border-radius:16px;background:#0d2a18;color:#fff;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dep .k{font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;opacity:.7}
+.dep b{font-size:20px;font-weight:900;letter-spacing:2px;font-family:ui-monospace,Menlo,Consolas,monospace;color:#ffd76a;margin-top:2px;display:block}
+.copy{padding:9px 14px;border:0;border-radius:12px;background:#fff;color:#00602a;font-size:12px;font-weight:900;cursor:pointer}
+.copy:active{transform:scale(.97)}
+.timer{display:flex;align-items:center;justify-content:space-between;margin:12px 0 4px;padding:11px 14px;border-radius:14px;background:#fff7e0;border:1px solid #f5d98a}
+.timer span{font-size:12px;font-weight:800;color:#8a5a00}
+.timer b{font-size:20px;font-weight:900;color:#8a5a00;font-variant-numeric:tabular-nums;letter-spacing:1px}
+.timer.late{background:#fff0f0;border-color:#f5b0b0}
+.timer.late span,.timer.late b{color:#d71920}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;font-weight:800;color:#4b6353;margin-bottom:6px}
+.field input{width:100%;padding:14px 14px;border:1.5px solid #dbe6df;border-radius:14px;font-size:16px;font-weight:800;letter-spacing:1px;outline:none;font-family:inherit;color:#0d2a18;background:#fbfdfb;transition:border-color .2s,box-shadow .2s}
+.field input:focus{border-color:#00782a;box-shadow:0 0 0 3px rgba(0,120,42,.13);background:#fff}
+.field .hint{font-size:11px;color:#6b8070;margin-top:5px;font-weight:600}
+.state{margin-top:12px;padding:13px 14px;border-radius:16px;font-size:13px;font-weight:800;text-align:center;line-height:1.45}
+.state.wait{background:#fff7e0;color:#8a5a00;border:1px solid #f5d98a}
+.state.ok{background:#e9f9ef;color:#00602a;border:1px solid #a0ddb8}
+.state.no{background:#fff0f0;color:#b82020;border:1px solid #f0a8a8}
+.foot{text-align:center;font-size:11px;color:rgba(255,255,255,.75);margin-top:14px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bar">
+    <a class="back" href="compte.html"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg> Retour</a>
+    <div class="brand">HEINEKEN<span>★</span></div>
+  </div>
+
+  <div class="steps">
+    <div class="step on"><i>1</i>Opérateur</div><div class="sline"></div>
+    <div class="step" id="st2"><i>2</i>Montant</div><div class="sline"></div>
+    <div class="step"><i>3</i>Paiement</div>
+  </div>
+
+  <div class="sheet">
+    <div class="label">Veuillez choisir l'opérateur à recharger</div>
+    <div class="tiles" id="ops">
+      <button type="button" class="tile" data-op="Wave"><span class="logo"><img src="logos/wave.png" alt="" onerror="this.remove()"><i>Wave</i></span><span><div class="tname">Wave</div><div class="tsub">Mobile money</div></span></button>
+      <button type="button" class="tile" data-op="MTN"><span class="logo"><img src="logos/mtn.png" alt="" onerror="this.remove()"><i>MTN</i></span><span><div class="tname">MTN</div><div class="tsub">Mobile money</div></span></button>
+      <button type="button" class="tile" data-op="Orange"><span class="logo"><img src="logos/orange.png" alt="" onerror="this.remove()"><i>Orange</i></span><span><div class="tname">Orange</div><div class="tsub">Orange Money</div></span></button>
+      <button type="button" class="tile" data-op="Moov"><span class="logo"><img src="logos/moov.png" alt="" onerror="this.remove()"><i>Moov</i></span><span><div class="tname">Moov</div><div class="tsub">Moov Money</div></span></button>
+    </div>
+
+    <div class="label">Veuillez saisir le montant à recharger</div>
+    <div class="tiles" id="amounts">
+      <button type="button" class="tile amt-tile" data-v="5500"><b>5 500 F</b></button>
+      <button type="button" class="tile amt-tile" data-v="12500"><b>12 500 F</b></button>
+      <button type="button" class="tile amt-tile" data-v="30500"><b>30 500 F</b></button>
+      <button type="button" class="tile amt-tile" data-v="50500"><b>50 500 F</b></button>
+      <button type="button" class="tile amt-tile" data-v="100000"><b>100 000 F</b></button>
+      <button type="button" class="tile amt-tile" data-v="150000"><b>150 000 F</b></button>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div><div class="k">Recharge</div><div class="v" id="sAmt">— F</div></div>
+    <div class="o"><div id="sOp">Choisissez un opérateur</div><div style="opacity:.75;font-weight:700;margin-top:3px">Solde : <span id="avail">—</span></div></div>
+  </div>
+
+  <div class="err" id="ferr"></div>
+  <button class="btn" id="goBtn" type="button" disabled>Continuer</button>
+  <div class="secure"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Paiement sécurisé</div>
+  <div class="foot">Là Boissons Heineken</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAVNLSc3JXWvTxiKk2n-mjmVUv39a_yuVM",
+  authDomain: "heineken-c174e.firebaseapp.com",
+  databaseURL: "https://heineken-c174e-default-rtdb.firebaseio.com",
+  projectId: "heineken-c174e",
+  storageBucket: "heineken-c174e.firebasestorage.app",
+  messagingSenderId: "756445276249",
+  appId: "1:756445276249:web:0989f661c0b97ef34be948"
+};
+const LOGIN_PAGE = "heineken-pro-v9.html";
+const OPERATORS = {
+  Wave:   { logo: "logos/wave.png",   deposit: "00000000" },
+  MTN:    { logo: "logos/mtn.png",    deposit: "" },
+  Orange: { logo: "logos/orange.png", deposit: "" },
+  Moov:   { logo: "logos/moov.png",   deposit: "" }
+};
+const DURATION_MS = 10 * 60 * 1000;
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const $ = id => document.getElementById(id);
+const fmt = n => Math.round(Number(n) || 0).toLocaleString("fr-FR");
+let uid = null, op = null, amount = 0;
+
+function setErr(msg, ok = false) { const e = $("ferr"); e.textContent = msg; e.className = "err" + (ok ? " ok" : ""); }
+function refresh() {
+  const dep = op ? OPERATORS[op].deposit : "";
+  $("sAmt").textContent = amount ? fmt(amount) + " F" : "— F";
+  $("sOp").textContent = op || "Choisissez un opérateur";
+  $("st2").classList.toggle("on", !!op);
+  $("goBtn").disabled = !(op && amount && dep);
+  if (op && amount && !dep) setErr(`Numéro de dépôt ${op} non configuré.`); else setErr("");
+}
+
+document.querySelectorAll("#ops .tile").forEach(b => b.addEventListener("click", () => {
+  op = b.dataset.op;
+  document.querySelectorAll("#ops .tile").forEach(x => x.classList.toggle("on", x === b));
+  refresh();
+}));
+document.querySelectorAll("#amounts .tile").forEach(b => b.addEventListener("click", () => {
+  amount = Number(b.dataset.v);
+  document.querySelectorAll("#amounts .tile").forEach(x => x.classList.toggle("on", x === b));
+  refresh();
+}));
+
+onAuthStateChanged(auth, user => {
+  if (!user) { window.location.href = LOGIN_PAGE; return; }
+  uid = user.uid;
+  onValue(ref(db, `users/${uid}/balance`), snap => { $("avail").textContent = fmt(snap.val()) + " F"; });
+});
+
+$("goBtn").addEventListener("click", async () => {
+  if (!uid || !op || !amount) return;
+  $("goBtn").disabled = true;
+  try {
+    const now = Date.now();
+    const recRef = push(ref(db, `users/${uid}/recharges`));
+    await set(recRef, { operator: op, amount, depositNumber: OPERATORS[op].deposit, status: "En attente", createdAt: now, expiresAt: now + DURATION_MS });
+    window.location.href = `confirmation-recharge.html?id=${recRef.key}`;
+  } catch (e) {
+    setErr("Erreur : " + e.message);
+    $("goBtn").disabled = false;
+  }
+});
+</script>
+</body>
+</html>

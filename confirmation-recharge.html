@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Heineken — Paiement de la recharge</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#0d2a18;min-height:100vh;background:radial-gradient(circle at 15% 0%,#1fa452 0%,transparent 45%),linear-gradient(170deg,#00782a 0%,#00602a 60%,#004a22 100%);background-attachment:fixed}
+.app{max-width:400px;margin:0 auto;padding:18px 16px 40px}
+.bar{display:flex;align-items:center;justify-content:space-between;color:#fff;margin-bottom:14px}
+.bar .back{color:#fff;text-decoration:none;font-size:13px;font-weight:700;opacity:.9;display:flex;align-items:center;gap:6px;cursor:pointer;background:none;border:0}
+.bar .back svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.bar .brand{font-size:14px;font-weight:900;letter-spacing:2.5px}
+.bar .brand span{color:#ff5a5f}
+.steps{display:flex;align-items:center;gap:8px;margin:4px 0 16px;color:#fff}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;opacity:.6}
+.step i{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:900}
+.step.on{opacity:1}
+.step.on i{background:#ffd76a;color:#3d2500;box-shadow:0 0 0 4px rgba(255,215,106,.25)}
+.step.done{opacity:1}
+.step.done i{background:#fff;color:#00782a}
+.sline{flex:1;height:2px;background:rgba(255,255,255,.25);margin-top:-18px}
+.sheet{background:#fff;border-radius:24px;padding:18px;box-shadow:0 18px 40px rgba(0,0,0,.25);margin-bottom:14px}
+.label{font-size:12px;font-weight:800;color:#4b6353;margin:2px 0 10px;letter-spacing:.2px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.tile{position:relative;border:1.5px solid #e2ece6;border-radius:16px;padding:12px 10px;background:#fff;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;transition:border-color .2s,box-shadow .2s,transform .15s;font-family:inherit}
+.tile:active{transform:scale(.98)}
+.tile.on{border-color:#00782a;box-shadow:0 0 0 3px rgba(0,120,42,.14)}
+.tile.on::after{content:"✓";position:absolute;right:9px;top:8px;width:18px;height:18px;border-radius:50%;background:#00782a;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.logo{width:40px;height:40px;border-radius:12px;background:#f3f7f4;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 40px}
+.logo img{max-width:80%;max-height:80%;object-fit:contain}
+.logo i{font-style:normal;font-size:11px;font-weight:900;color:#00602a}
+.tname{font-size:13px;font-weight:900;color:#0d2a18}
+.tsub{font-size:10px;color:#6b8070;font-weight:700}
+.amt-tile{justify-content:center;flex-direction:column;gap:2px;padding:14px 8px}
+.amt-tile b{font-size:16px;font-weight:900;color:#0d2a18}
+.amt-tile small{font-size:10px;color:#6b8070;font-weight:700}
+.amt-tile.on b{color:#00782a}
+.summary{background:linear-gradient(135deg,#ffe9a0,#ffd76a 45%,#f5b82e);border-radius:20px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;color:#3d2500;margin-bottom:14px;box-shadow:0 12px 24px rgba(245,184,46,.35)}
+.summary .k{font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;opacity:.8}
+.summary .v{font-size:22px;font-weight:900;margin-top:2px}
+.summary .o{font-size:12px;font-weight:800;text-align:right}
+.btn{width:100%;padding:16px;border:0;border-radius:16px;font-size:15px;font-weight:900;letter-spacing:.3px;color:#fff;background:linear-gradient(135deg,#00782a,#25b96a);box-shadow:0 12px 24px rgba(0,120,42,.35);cursor:pointer;transition:transform .15s,opacity .2s}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.45;cursor:default;box-shadow:none}
+.secure{display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;font-size:11px;font-weight:700;opacity:.85;margin-top:12px}
+.secure svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.err{min-height:18px;font-size:12px;font-weight:800;color:#d71920;text-align:center;margin-bottom:8px}
+.err.ok{color:#00782a}
+.hero{text-align:center;padding:6px 0 4px}
+.hero .k{font-size:11px;font-weight:800;color:#6b8070;letter-spacing:.6px;text-transform:uppercase}
+.hero .big{font-size:36px;font-weight:900;color:#0d2a18;margin-top:4px;letter-spacing:.3px}
+.hero .big span{font-size:18px;color:#00782a}
+.chip{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:6px 12px;border-radius:999px;background:#f0f7f2;font-size:12px;font-weight:800;color:#00602a}
+.chip .logo{width:24px;height:24px;flex:0 0 24px;border-radius:8px}
+.chip .logo i{font-size:8px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-top:1px dashed #dbe6df;font-size:13px}
+.row span{color:#6b8070;font-weight:700}
+.row b{font-weight:900}
+.dep{margin-top:6px;border-radius:16px;background:#0d2a18;color:#fff;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dep .k{font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;opacity:.7}
+.dep b{font-size:20px;font-weight:900;letter-spacing:2px;font-family:ui-monospace,Menlo,Consolas,monospace;color:#ffd76a;margin-top:2px;display:block}
+.copy{padding:9px 14px;border:0;border-radius:12px;background:#fff;color:#00602a;font-size:12px;font-weight:900;cursor:pointer}
+.copy:active{transform:scale(.97)}
+.timer{display:flex;align-items:center;justify-content:space-between;margin:12px 0 4px;padding:11px 14px;border-radius:14px;background:#fff7e0;border:1px solid #f5d98a}
+.timer span{font-size:12px;font-weight:800;color:#8a5a00}
+.timer b{font-size:20px;font-weight:900;color:#8a5a00;font-variant-numeric:tabular-nums;letter-spacing:1px}
+.timer.late{background:#fff0f0;border-color:#f5b0b0}
+.timer.late span,.timer.late b{color:#d71920}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;font-weight:800;color:#4b6353;margin-bottom:6px}
+.field input{width:100%;padding:14px 14px;border:1.5px solid #dbe6df;border-radius:14px;font-size:16px;font-weight:800;letter-spacing:1px;outline:none;font-family:inherit;color:#0d2a18;background:#fbfdfb;transition:border-color .2s,box-shadow .2s}
+.field input:focus{border-color:#00782a;box-shadow:0 0 0 3px rgba(0,120,42,.13);background:#fff}
+.field .hint{font-size:11px;color:#6b8070;margin-top:5px;font-weight:600}
+.state{margin-top:12px;padding:13px 14px;border-radius:16px;font-size:13px;font-weight:800;text-align:center;line-height:1.45}
+.state.wait{background:#fff7e0;color:#8a5a00;border:1px solid #f5d98a}
+.state.ok{background:#e9f9ef;color:#00602a;border:1px solid #a0ddb8}
+.state.no{background:#fff0f0;color:#b82020;border:1px solid #f0a8a8}
+.foot{text-align:center;font-size:11px;color:rgba(255,255,255,.75);margin-top:14px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bar">
+    <a class="back" href="recharge.html"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg> Modifier</a>
+    <div class="brand">HEINEKEN<span>★</span></div>
+  </div>
+
+  <div class="steps">
+    <div class="step done"><i>✓</i>Opérateur</div><div class="sline"></div>
+    <div class="step done"><i>✓</i>Montant</div><div class="sline"></div>
+    <div class="step on"><i>3</i>Paiement</div>
+  </div>
+
+  <div class="sheet">
+    <div class="hero">
+      <div class="k">Montant à payer</div>
+      <div class="big" id="cAmt">— <span>F</span></div>
+      <div class="chip"><span class="logo" id="cLogo"><i id="cLogoTxt">—</i></span><span id="cOp">—</span></div>
+    </div>
+
+    <div class="row"><span>Id de la demande</span><b id="cId">—</b></div>
+
+    <div class="label" style="margin-top:12px">Numéro de dépôt</div>
+    <div class="dep">
+      <div><div class="k">À payer vers</div><b id="cDep">—</b></div>
+      <button class="copy" id="copyBtn" type="button">Copier</button>
+    </div>
+
+    <div class="timer" id="timer"><span>Temps restant</span><b id="clock">10:00</b></div>
+    <p class="fhint" style="font-size:11px;color:#6b8070;margin:8px 2px 0;line-height:1.5">Payez ce montant dans les 10 minutes. Sans paiement validé à temps, la demande sera annulée automatiquement.</p>
+  </div>
+
+  <div class="sheet">
+    <div class="field">
+      <label for="fromPhone">Veuillez ajouter votre numéro de dépôt</label>
+      <input id="fromPhone" type="tel" inputmode="numeric" maxlength="10" placeholder="Ex : 0700258392" autocomplete="off">
+      <div class="hint">Le numéro depuis lequel vous avez payé.</div>
+    </div>
+    <div class="field">
+      <label for="txId">Id de transaction</label>
+      <input id="txId" type="text" placeholder="Ex : CI123456789" autocomplete="off">
+      <div class="hint">Identifiant reçu par SMS après le paiement.</div>
+    </div>
+    <div class="err" id="ferr"></div>
+    <button class="btn" id="validateBtn" type="button">Valider le paiement</button>
+    <div class="state wait" id="stateBox" style="display:none"></div>
+  </div>
+
+  <div class="secure"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Paiement sécurisé</div>
+  <div class="foot">Là Boissons Heineken</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAVNLSc3JXWvTxiKk2n-mjmVUv39a_yuVM",
+  authDomain: "heineken-c174e.firebaseapp.com",
+  databaseURL: "https://heineken-c174e-default-rtdb.firebaseio.com",
+  projectId: "heineken-c174e",
+  storageBucket: "heineken-c174e.firebasestorage.app",
+  messagingSenderId: "756445276249",
+  appId: "1:756445276249:web:0989f661c0b97ef34be948"
+};
+const LOGIN_PAGE = "heineken-pro-v9.html";
+const OPERATORS = {
+  Wave:   { logo: "logos/wave.png",   deposit: "00000000" },
+  MTN:    { logo: "logos/mtn.png",    deposit: "" },
+  Orange: { logo: "logos/orange.png", deposit: "" },
+  Moov:   { logo: "logos/moov.png",   deposit: "" }
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const $ = id => document.getElementById(id);
+const fmt = n => Math.round(Number(n) || 0).toLocaleString("fr-FR");
+const recId = new URLSearchParams(location.search).get("id");
+let uid = null, rec = null, tick = null;
+
+function setErr(msg, ok = false) { const e = $("ferr"); e.textContent = msg; e.className = "err" + (ok ? " ok" : ""); }
+function showState(kind, text) { const b = $("stateBox"); b.className = "state " + kind; b.textContent = text; b.style.display = "block"; }
+function fmtClock(ms) {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+}
+const isExpired = r => r.status === "En attente" && Date.now() >= r.expiresAt;
+
+async function cancelIfExpired() {
+  if (!rec || !isExpired(rec)) return;
+  await update(ref(db, `users/${uid}/recharges/${recId}`), { status: "Annulé", cancelledAt: Date.now() });
+  rec.status = "Annulé";
+}
+
+function render() {
+  if (!rec) return;
+  const expired = isExpired(rec);
+  const pending = rec.status === "En attente" && !expired;
+  $("cAmt").innerHTML = fmt(rec.amount) + ' <span>F</span>';
+  $("cOp").textContent = rec.operator;
+  $("cLogoTxt").textContent = rec.operator;
+  $("cId").textContent = recId.slice(-8).toUpperCase();
+  $("cDep").textContent = rec.depositNumber || "Non configuré";
+  $("clock").textContent = pending ? fmtClock(rec.expiresAt - Date.now()) : "—";
+  $("timer").classList.toggle("late", pending && rec.expiresAt - Date.now() < 60000);
+  $("validateBtn").disabled = !pending;
+  $("copyBtn").disabled = !pending;
+  $("fromPhone").disabled = !pending;
+  $("txId").disabled = !pending;
+  if (rec.status === "Annulé" || expired) showState("no", "Délai dépassé : la demande est annulée. Le paiement n'a pas été validé dans les 10 minutes.");
+  else if (rec.status === "En vérification") showState("wait", "Paiement reçu. Votre solde sera crédité après vérification.");
+  else if (rec.status === "Validé") showState("ok", "Recharge validée : le montant a été ajouté à votre solde.");
+  else $("stateBox").style.display = "none";
+}
+
+async function loadRec() {
+  const snap = await get(ref(db, `users/${uid}/recharges/${recId}`));
+  if (!snap.exists()) { setErr("Demande de recharge introuvable."); $("validateBtn").disabled = true; return; }
+  rec = snap.val();
+  await cancelIfExpired();
+  render();
+}
+
+$("copyBtn").addEventListener("click", async () => {
+  if (!rec?.depositNumber) return;
+  try { await navigator.clipboard.writeText(rec.depositNumber); setErr("Numéro copié.", true); }
+  catch { setErr("Copie impossible sur cet appareil."); }
+});
+
+$("validateBtn").addEventListener("click", async () => {
+  const fromPhone = $("fromPhone").value.replace(/\s/g, "");
+  const txId = $("txId").value.trim();
+  if (!/^\d{8,10}$/.test(fromPhone)) return setErr("Ajoutez votre numéro de dépôt : 8 à 10 chiffres.");
+  if (txId.length < 6) return setErr("Saisissez l'id de transaction (au moins 6 caractères).");
+  if (!rec || rec.status !== "En attente") return;
+  if (isExpired(rec)) { await cancelIfExpired(); render(); return; }
+  $("validateBtn").disabled = true;
+  try {
+    await update(ref(db, `users/${uid}/recharges/${recId}`), { status: "En vérification", fromPhone, txId, paidAt: Date.now() });
+    rec.status = "En vérification";
+    setErr("");
+    render();
+  } catch (e) {
+    setErr("Erreur : " + e.message);
+    $("validateBtn").disabled = false;
+  }
+});
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href = LOGIN_PAGE; return; }
+  if (!recId) { setErr("Aucune demande de recharge."); return; }
+  uid = user.uid;
+  await loadRec();
+  tick = setInterval(async () => {
+    if (!rec) return;
+    if (isExpired(rec)) await cancelIfExpired().catch(() => {});
+    render();
+    if (rec.status !== "En attente") clearInterval(tick);
+  }, 1000);
+});
+</script>
+</body>
+</html>

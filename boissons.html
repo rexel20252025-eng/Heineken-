@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Heineken — Boissons</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#fff;background:radial-gradient(circle at 20% 10%,#14934a 0%,transparent 45%),radial-gradient(circle at 85% 90%,#0a4f20 0%,transparent 50%),linear-gradient(170deg,#00782a 0%,#00602a 60%,#004a22 100%);background-attachment:fixed;min-height:100vh}
+.app{width:100%;max-width:420px;margin:0 auto;padding:22px 16px 110px}
+.top{text-align:center;margin-bottom:18px}
+.top .brand{font-size:24px;font-weight:800;letter-spacing:4px}
+.top .brand span{color:#ff3b3b}
+.top .sub{font-size:10px;letter-spacing:3px;opacity:.75;margin-top:4px}
+h2{font-size:20px;margin:6px 2px 14px}
+.lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;opacity:.8}
+.empty{text-align:center;padding:40px 10px;opacity:.85;font-size:14px;line-height:1.6;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px}
+.rental{position:relative;overflow:hidden;padding:16px;margin-bottom:16px;border-radius:20px;background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.06) 60%,rgba(215,25,32,.22));border:1px solid rgba(255,255,255,.25);box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.rhead{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.pico{width:52px;height:62px;flex:0 0 52px;background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,.08));border-radius:14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center}
+.pico svg{height:50px;width:auto}
+.rname{font-size:16px;font-weight:800;flex:1;min-width:0}
+.badge{font-size:10px;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.5px;text-transform:uppercase;background:linear-gradient(135deg,#ff4d55,#d71920)}
+.badge.end{background:rgba(255,255,255,.25)}
+.row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.14);font-size:13px}
+.row:last-of-type{border-bottom:0}
+.row span:first-child{opacity:.78}
+.row b{font-weight:800;text-align:right;white-space:nowrap}
+.rental .gain b{white-space:nowrap}
+.gain{margin-top:12px;padding:12px;border-radius:14px;background:linear-gradient(135deg,#ffd76a,#f5b82e);color:#4a2f00;display:flex;justify-content:space-between;align-items:center}
+.gain span{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase}
+.gain b{font-size:17px;font-weight:900}
+nav.bottom{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:420px;background:rgba(0,50,22,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.15);display:grid;grid-template-columns:repeat(4,1fr);padding:8px 6px 10px;z-index:30}
+nav.bottom a{text-decoration:none;color:#fff;opacity:.6;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:6px 0;border-radius:12px}
+nav.bottom a svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.bottom a.on{opacity:1;background:rgba(255,255,255,.12)}
+nav.bottom a.on svg{stroke:#ff3b3b}
+.toast{position:fixed;z-index:80;left:50%;bottom:96px;transform:translateX(-50%);background:#fff;color:#00602a;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;box-shadow:0 8px 20px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap}
+.toast.show{opacity:1}
+.mine{width:100%;margin-top:12px;padding:13px;border:0;border-radius:12px;background:linear-gradient(180deg,#ffffff,#eaf5ee);color:#00782a;font-size:14px;font-weight:800;letter-spacing:.4px;cursor:pointer;box-shadow:0 6px 14px rgba(0,0,0,.25)}
+.mine:disabled{opacity:.55;cursor:default}
+.mine:not(:disabled):active{transform:scale(.98)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">HEINEKEN<span>★</span></div>
+    <div class="sub">LÀ BOISSONS · PURE MALT LAGER</div>
+  </header>
+
+  <h2>Mes boissons louées</h2>
+  <div id="list"><div class="empty">Chargement de vos boissons…</div></div>
+</div>
+
+<nav class="bottom">
+  <a href="accueil.html">
+    <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+    Accueil
+  </a>
+  <a href="boissons.html" class="on">
+    <svg viewBox="0 0 24 24"><path d="M8 3h8l-1 5a4 4 0 0 1-6 0z"/><path d="M9 12v8h6v-8"/><path d="M7 21h10"/></svg>
+    Boissons
+  </a>
+  <a href="partage.html">
+    <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.6"/><path d="M8.2 13.2l7.6 4.6"/></svg>
+    Partage
+  </a>
+  <a href="compte.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+    Compte
+  </a>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+const PICO_SVG = `<svg viewBox="0 0 120 340" aria-hidden="true"><rect x="41" y="0" width="38" height="24" rx="4" fill="#2fbf5e"/><path d="M46 25H74V42Q74 76 91 98Q96 106 95 128V318Q95 332 81 332H39Q25 332 25 318V128Q24 106 29 98Q46 76 46 42Z" fill="#0f7a33"/><rect x="24" y="176" width="72" height="108" rx="3" fill="#fff"/><polygon points="60,191 63.2,200.6 73.3,200.7 65.2,206.7 68.2,216.3 60,210.5 51.8,216.3 54.8,206.7 46.7,200.7 56.8,200.6" fill="#d71920"/></svg>`;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAVNLSc3JXWvTxiKk2n-mjmVUv39a_yuVM",
+  authDomain: "heineken-c174e.firebaseapp.com",
+  databaseURL: "https://heineken-c174e-default-rtdb.firebaseio.com",
+  projectId: "heineken-c174e",
+  storageBucket: "heineken-c174e.firebasestorage.app",
+  messagingSenderId: "756445276249",
+  appId: "1:756445276249:web:0989f661c0b97ef34be948"
+};
+const LOGIN_PAGE = "heineken-pro-v9.html";
+// Les jours commencent à 00h00 (Abidjan = UTC+0)
+const DAY = 86400000;
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const list = document.getElementById("list");
+const fmt = n => Math.round(Number(n) || 0).toLocaleString("fr-FR");
+let uid = null;
+let rentals = {};
+
+function toast(t) {
+  const el = document.getElementById("toast");
+  el.textContent = t;
+  el.classList.add("show");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove("show"), 2600);
+}
+
+// Jour de départ (numéro de jour depuis le 1er janvier 1970, à 00h00)
+const startDayOf = r => r.startDay ?? Math.floor(r.startAt / DAY);
+// Jours déjà gagnés à l'instant t : un jour est gagné à chaque passage à 00h00
+function earnedDays(r, now = Date.now()) {
+  const today = Math.floor(now / DAY);
+  return Math.min(r.days, Math.max(0, today - startDayOf(r)));
+}
+// Jours déjà récupérés (compatibilité avec l'ancien modèle)
+const claimedDaysOf = r => r.claimedDays ?? Math.round((r.claimed || 0) / (r.benefit || 1));
+// Jours gagnés mais pas encore miné
+const pendingDays = (r, now = Date.now()) => Math.max(0, earnedDays(r, now) - claimedDaysOf(r));
+
+// Miner : transfère sur le solde les gains des jours passés, en une seule transaction
+async function mine(key) {
+  const rref = ref(db, `users/${uid}/rentals/${key}`);
+  let amount = 0;
+  const res = await runTransaction(rref, r => {
+    if (!r) return r;
+    const n = pendingDays(r);
+    if (n <= 0) return;                  // rien à miner : on annule
+    amount = n * r.benefit;
+    return { ...r, startDay: startDayOf(r), claimedDays: claimedDaysOf(r) + n, claimed: (r.claimed || 0) + amount };
+  });
+  if (res.committed && amount > 0) {
+    await runTransaction(ref(db, `users/${uid}/balance`), b => (b || 0) + amount);
+    toast(`+${fmt(amount)}F ajoutés à votre solde`);
+  } else {
+    toast("Rien à miner pour l'instant");
+  }
+}
+
+function fmtDate(t) {
+  return new Date(t).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+}
+function nextMidnight(now = Date.now()) {
+  return (Math.floor(now / DAY) + 1) * DAY;
+}
+
+function render() {
+  const keys = Object.keys(rentals);
+  if (!keys.length) {
+    list.innerHTML = '<div class="empty">Vous n\'avez encore loué aucune palette.<br>Rendez-vous sur l\'accueil et appuyez sur « Louer ».</div>';
+    return;
+  }
+  const now = Date.now();
+  list.innerHTML = keys.map(k => {
+    const r = rentals[k];
+    const done = earnedDays(r, now) >= r.days;
+    const pend = pendingDays(r, now);
+    const endAt = (startDayOf(r) + r.days) * DAY;
+    return `
+    <div class="rental">
+      <div class="rhead">
+        <div class="pico">${PICO_SVG}</div>
+        <div class="rname">${r.name}</div>
+        <span class="badge ${done ? "end" : ""}">${done ? "Terminée" : "En cours"}</span>
+      </div>
+      <div class="row"><span>Prix payé</span><b>${fmt(r.price)} F</b></div>
+      <div class="row"><span>Gain par jour</span><b>${fmt(r.benefit)} F</b></div>
+      <div class="row"><span>Jours gagnés</span><b>${earnedDays(r, now)} / ${r.days}</b></div>
+      <div class="row"><span>Bénéfice total</span><b>${fmt(r.total)} F</b></div>
+      <div class="row"><span>Début</span><b>${fmtDate(r.startAt)}</b></div>
+      <div class="row"><span>Fin</span><b>${fmtDate(endAt)}</b></div>
+      <div class="row"><span>Déjà miné</span><b>${fmt(r.claimed || 0)} F</b></div>
+      ${done ? "" : `<div class="row"><span>Prochain gain</span><b>${fmtDate(nextMidnight(now))}</b></div>`}
+      <div class="gain"><span>À miner</span><b>${fmt(pend * r.benefit)} F</b></div>
+      <button class="mine" data-key="${k}" ${pend > 0 ? "" : "disabled"}>${pend > 0 ? "⛏ Miner mes bénéfices" : "Rien à miner pour l'instant"}</button>
+    </div>`;
+  }).join("");
+}
+
+list.addEventListener("click", e => {
+  const btn = e.target.closest(".mine");
+  if (btn && !btn.disabled) mine(btn.dataset.key).catch(err => toast("Erreur : " + err.message));
+});
+
+onAuthStateChanged(auth, user => {
+  if (!user) { window.location.href = LOGIN_PAGE; return; }
+  uid = user.uid;
+  onValue(ref(db, `users/${uid}/rentals`), snap => {
+    rentals = snap.exists() ? snap.val() : {};
+    render();
+  });
+});
+
+// Rafraîchit l'affichage à chaque minute et juste après 00h00
+setInterval(render, 60000);
+</script>
+</body>
+</html>

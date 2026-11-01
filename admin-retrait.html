@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heineken — Admin Retraits</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --g1: #0d5c2e;
+  --g2: #1a8c4e;
+  --g3: #25b96a;
+  --gold: #e2b04a;
+  --dark: #071a0f;
+  --bg: #f0f6f2;
+  --card: #ffffff;
+  --muted: #6b8070;
+  --border: #cce4d6;
+  --pending: #c07810;
+  --pending-bg: #fff8ec;
+  --pending-border: #f0cc80;
+  --success: #0d7a3c;
+  --success-bg: #edfaf3;
+  --success-border: #a0ddb8;
+  --rejected: #b82020;
+  --rejected-bg: #fff0f0;
+  --rejected-border: #f0a8a8;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0 14px 60px;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; top: -160px; left: -160px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(26,140,78,.12) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+
+/* LOADING */
+#loadingOverlay {
+  position: fixed; inset: 0;
+  background: rgba(240,246,242,.95);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 9999; backdrop-filter: blur(6px);
+  transition: opacity .4s;
+}
+#loadingOverlay.hidden { opacity: 0; pointer-events: none; }
+.spinner { width: 42px; height: 42px; border: 3px solid var(--border); border-top-color: var(--g2); border-radius: 50%; animation: spin .75s linear infinite; margin-bottom: 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 13px; color: var(--muted); font-style: italic; }
+
+/* TOP BAR */
+.topbar {
+  width: 100%; max-width: 600px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 28px 0 20px;
+  position: relative; z-index: 1;
+  animation: fadeDown .5s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes fadeDown {
+  from { opacity:0; transform:translateY(-14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.admin-logo {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: linear-gradient(145deg, var(--g1), var(--g2));
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(26,140,78,.3);
+}
+.admin-logo svg { width: 22px; height: 22px; }
+.admin-title { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 18px; color: var(--dark); }
+.admin-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.admin-badge {
+  background: linear-gradient(135deg, var(--g1), var(--g2));
+  color: white; font-size: 10px; font-weight: 700;
+  padding: 4px 12px; border-radius: 50px; letter-spacing: .05em;
+}
+
+/* STATS */
+.stats-row {
+  width: 100%; max-width: 600px;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; margin-bottom: 16px;
+  position: relative; z-index: 1;
+  animation: slideUp .5s .05s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.stat-box {
+  background: var(--card); border-radius: 14px;
+  padding: 12px 10px; text-align: center;
+  border: 1px solid var(--border);
+  box-shadow: 0 3px 12px rgba(13,92,46,.06);
+}
+.stat-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 800; }
+.stat-val.all     { color: var(--g1); }
+.stat-val.pending { color: var(--pending); }
+.stat-val.ok      { color: var(--success); }
+.stat-val.no      { color: var(--rejected); }
+.stat-label { font-size: 9px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .07em; margin-top: 2px; }
+
+/* AMOUNT TOTAL */
+.total-band {
+  width: 100%; max-width: 600px;
+  background: linear-gradient(135deg, var(--g1), var(--g2) 60%, #2dd47a);
+  border-radius: 16px; padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; position: relative; z-index: 1;
+  overflow: hidden;
+  box-shadow: 0 10px 32px rgba(13,92,46,.2);
+  animation: slideUp .5s .08s cubic-bezier(.22,1,.36,1) both;
+}
+.total-band::before { content:''; position:absolute; top:-40px; right:-30px; width:120px; height:120px; border-radius:50%; background:rgba(255,255,255,.07); }
+.total-band-label { font-size: 11px; color: rgba(255,255,255,.65); font-weight: 600; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
+.total-band-amt   { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 800; color: white; }
+.total-band-amt span { font-size: 13px; opacity: .7; margin-left: 4px; }
+.total-band-right { text-align: right; position: relative; z-index: 1; }
+.total-pending-label { font-size: 10px; color: rgba(255,255,255,.6); }
+.total-pending-val   { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: #ffd97a; }
+
+/* FILTER + SEARCH */
+.controls {
+  width: 100%; max-width: 600px;
+  display: flex; gap: 8px; margin-bottom: 14px;
+  position: relative; z-index: 1;
+  animation: slideUp .5s .1s cubic-bezier(.22,1,.36,1) both;
+}
+.search-wrap { flex: 1; position: relative; }
+.search-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); width:14px; height:14px; fill:var(--muted); }
+.search-input {
+  width: 100%; padding: 10px 12px 10px 34px;
+  border: 1.5px solid var(--border); border-radius: 11px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;
+  background: var(--card); color: var(--dark); outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.search-input:focus { border-color: var(--g2); box-shadow: 0 0 0 3px rgba(26,140,78,.09); }
+
+.filter-sel {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border); border-radius: 11px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600;
+  background: var(--card); color: var(--dark); outline: none; cursor: pointer;
+  -webkit-appearance: none;
+}
+
+/* LIST */
+.section-label {
+  width: 100%; max-width: 600px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px; position: relative; z-index: 1;
+}
+.section-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; color: var(--g1); display: flex; align-items: center; gap: 7px; }
+.count-pill { background: var(--g2); color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 50px; }
+
+/* BOUTON REFUSER TOUT */
+.btn-reject-all {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px;
+  background: var(--rejected-bg);
+  color: var(--rejected);
+  border: 1.5px solid var(--rejected-border);
+  border-radius: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  transition: background .15s, transform .15s, box-shadow .15s;
+  box-shadow: 0 2px 8px rgba(184,32,32,.1);
+  white-space: nowrap;
+}
+.btn-reject-all:hover {
+  background: #ffdcdc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(184,32,32,.18);
+}
+.btn-reject-all:active { transform: translateY(0); }
+.btn-reject-all svg { width: 12px; height: 12px; fill: var(--rejected); flex-shrink: 0; }
+.btn-reject-all:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+.withdraw-list {
+  width: 100%; max-width: 600px;
+  display: flex; flex-direction: column; gap: 12px;
+  position: relative; z-index: 1;
+}
+
+/* ADMIN CARD */
+.wd-card {
+  background: var(--card); border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 18px rgba(13,92,46,.07);
+  overflow: hidden;
+  animation: popIn .35s cubic-bezier(.22,1,.36,1) both;
+  transition: box-shadow .2s;
+}
+.wd-card:hover { box-shadow: 0 8px 28px rgba(13,92,46,.12); }
+@keyframes popIn {
+  from { opacity:0; transform:scale(.96) translateY(8px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+.wd-card.status-pending  { border-left: 4px solid var(--pending); }
+.wd-card.status-success  { border-left: 4px solid var(--success); }
+.wd-card.status-rejected { border-left: 4px solid var(--rejected); }
+
+.wd-top {
+  padding: 14px 16px 10px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+}
+.wd-left {}
+.wd-user { font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 3px; }
+.wd-amount { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; color: var(--dark); }
+.wd-net { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.wd-net strong { color: var(--success); }
+
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px; border-radius: 50px; font-size: 10px; font-weight: 700; white-space: nowrap;
+}
+.status-badge.pending  { background: var(--pending-bg);  color: var(--pending);  border:1px solid var(--pending-border); }
+.status-badge.success  { background: var(--success-bg);  color: var(--success);  border:1px solid var(--success-border); }
+.status-badge.rejected { background: var(--rejected-bg); color: var(--rejected); border:1px solid var(--rejected-border); }
+.status-dot { width:6px; height:6px; border-radius:50%; }
+.status-dot.pending  { background: var(--pending); animation: blink 1.2s infinite; }
+.status-dot.success  { background: var(--success); }
+.status-dot.rejected { background: var(--rejected); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.wd-divider { height: 1px; background: var(--border); margin: 0 16px; }
+
+.wd-info-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 0; padding: 10px 16px;
+}
+.wd-info-item { padding: 5px 0; }
+.info-label { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 2px; }
+.info-val   { font-size: 12px; font-weight: 600; color: var(--dark); display: flex; align-items: center; gap: 5px; }
+.op-pill    { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 50px; color: white; }
+.copy-btn   { cursor: pointer; opacity: .5; transition: opacity .15s; }
+.copy-btn:hover { opacity: 1; }
+.copy-btn svg { width: 12px; height: 12px; fill: var(--g2); }
+
+.wd-actions {
+  padding: 10px 16px 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.wd-date { font-size: 10px; color: var(--muted); flex: 1; }
+
+.btn-approve {
+  padding: 9px 18px;
+  background: linear-gradient(135deg, var(--g1), var(--g2));
+  color: white; border: none; border-radius: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  box-shadow: 0 4px 14px rgba(26,140,78,.28);
+  transition: transform .15s, box-shadow .15s;
+}
+.btn-approve:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(26,140,78,.35); }
+.btn-approve:active { transform: translateY(1px); }
+.btn-approve svg { width: 13px; height: 13px; fill: white; }
+
+.btn-reject {
+  padding: 9px 16px;
+  background: var(--rejected-bg); color: var(--rejected);
+  border: 1.5px solid var(--rejected-border); border-radius: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: background .15s;
+}
+.btn-reject:hover { background: #ffdcdc; }
+.btn-reject svg { width: 13px; height: 13px; fill: var(--rejected); }
+
+.btn-done {
+  padding: 9px 16px;
+  background: #f2f2f2; color: #aaa;
+  border: 1.5px solid #e0e0e0; border-radius: 10px;
+  font-size: 12px; font-weight: 600;
+  cursor: default; display: flex; align-items: center; gap: 5px;
+}
+
+/* EMPTY */
+.empty-state {
+  text-align: center; padding: 44px 20px;
+  background: var(--card); border-radius: 18px;
+  border: 1.5px dashed var(--border);
+  width: 100%; max-width: 600px;
+  position: relative; z-index: 1;
+}
+.empty-icon  { font-size: 44px; margin-bottom: 10px; }
+.empty-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 5px; }
+.empty-sub   { font-size: 12px; color: var(--muted); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 26px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  color: white; padding: 12px 24px; border-radius: 50px;
+  font-size: 12px; font-weight: 600;
+  box-shadow: 0 8px 28px rgba(0,0,0,.2);
+  transition: transform .35s cubic-bezier(.22,1,.36,1);
+  z-index: 999; white-space: nowrap; background: var(--g1);
+}
+.toast.show    { transform: translateX(-50%) translateY(0); }
+.toast.success { background: var(--success); }
+.toast.error   { background: var(--rejected); }
+.toast.warning { background: var(--pending); }
+
+/* CONFIRM MODAL */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(7,26,15,.55); backdrop-filter: blur(4px);
+  z-index: 8000; display: none;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card); border-radius: 20px; padding: 26px 24px;
+  max-width: 360px; width: 100%;
+  box-shadow: 0 24px 60px rgba(0,0,0,.22);
+  animation: popIn .3s cubic-bezier(.22,1,.36,1);
+}
+.modal-icon  { font-size: 36px; text-align: center; margin-bottom: 10px; }
+.modal-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--dark); text-align: center; margin-bottom: 6px; }
+.modal-body  { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.6; margin-bottom: 14px; }
+.modal-body strong { color: var(--dark); }
+.modal-actions { display: flex; gap: 10px; margin-top: 6px; }
+.modal-actions button { flex: 1; padding: 11px; border-radius: 11px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; border: none; }
+.modal-cancel  { background: #f2f2f2; color: #666; }
+.modal-confirm { background: linear-gradient(135deg, var(--g1), var(--g2)); color: white; box-shadow: 0 4px 14px rgba(26,140,78,.28); }
+.modal-confirm.danger { background: linear-gradient(135deg, #a00, var(--rejected)); box-shadow: 0 4px 14px rgba(184,32,32,.28); }
+
+/* MODALE REFUSER TOUT */
+.bulk-reject-field { width: 100%; margin-bottom: 14px; }
+.bulk-reject-label {
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: 6px; display: block; text-align: left;
+}
+.bulk-reject-input {
+  width: 100%; padding: 10px 12px;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px;
+  background: var(--bg); color: var(--dark); outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.bulk-reject-input:focus {
+  border-color: var(--rejected);
+  box-shadow: 0 0 0 3px rgba(184,32,32,.08);
+}
+.bulk-reject-input::placeholder { color: #b0bfb8; }
+.bulk-reject-hint {
+  font-size: 10px; color: var(--muted); text-align: left;
+  margin-top: 5px; line-height: 1.5;
+  display: flex; align-items: flex-start; gap: 5px;
+}
+.bulk-reject-hint::before { content: 'ℹ️'; font-size: 11px; flex-shrink: 0; }
+.bulk-separator { height: 1px; background: var(--border); margin: 14px 0; }
+.bulk-warning {
+  background: var(--rejected-bg); border: 1px solid var(--rejected-border);
+  border-radius: 10px; padding: 10px 12px;
+  font-size: 11px; color: var(--rejected); font-weight: 600;
+  margin-bottom: 14px; text-align: center;
+  display: none;
+}
+.bulk-warning.visible { display: block; }
+
+/* COPY NOTIF */
+#copyNotif {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--dark); color: white; padding: 8px 18px; border-radius: 50px;
+  font-size: 12px; font-weight: 600; z-index: 9000;
+  opacity: 0; transition: opacity .3s; pointer-events: none;
+}
+#copyNotif.show { opacity: 1; }
+
+/* Progress bar pour refus en masse */
+.progress-bar-wrap {
+  width: 100%; background: #f0f0f0; border-radius: 50px;
+  height: 6px; margin-top: 12px; overflow: hidden;
+  display: none;
+}
+.progress-bar-wrap.visible { display: block; }
+.progress-bar-fill {
+  height: 100%; border-radius: 50px;
+  background: linear-gradient(90deg, var(--rejected), #e05555);
+  width: 0%; transition: width .3s;
+}
+</style>
+</head>
+<body>
+
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Chargement des retraits…</div>
+</div>
+
+<div id="copyNotif">📋 Numéro copié !</div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="admin-logo">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 3C8.5 3 6 5 5 7.5C4 10 4.5 12.5 6 14.5C7 16 8.5 17 8.5 19H15.5C15.5 17 17 16 18 14.5C19.5 12.5 20 10 19 7.5C18 5 15.5 3 12 3Z" fill="#e2b04a"/>
+        <rect x="9" y="19" width="6" height="2" rx="1" fill="#e2b04a"/>
+        <rect x="10" y="21" width="4" height="1.5" rx=".75" fill="#c8932a"/>
+        <line x1="12" y1="8" x2="12" y2="15" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="admin-title">HEINEKEN<span style="color:var(--gold)">★</span></div>
+      <div class="admin-sub">Panneau administrateur</div>
+    </div>
+  </div>
+  <div class="admin-badge">⚙️ ADMIN</div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-box"><div class="stat-val all" id="cntAll">0</div><div class="stat-label">Total</div></div>
+  <div class="stat-box"><div class="stat-val pending" id="cntPending">0</div><div class="stat-label">En attente</div></div>
+  <div class="stat-box"><div class="stat-val ok" id="cntSuccess">0</div><div class="stat-label">Approuvés</div></div>
+  <div class="stat-box"><div class="stat-val no" id="cntRejected">0</div><div class="stat-label">Refusés</div></div>
+</div>
+
+<div class="total-band">
+  <div>
+    <div class="total-band-label">Montant total demandé</div>
+    <div class="total-band-amt" id="totalAmt">0 <span>F</span></div>
+  </div>
+  <div class="total-band-right">
+    <div class="total-pending-label">En attente</div>
+    <div class="total-pending-val" id="totalPending">0 F</div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    <input class="search-input" id="searchInput" type="text" placeholder="Rechercher nom, numéro, opérateur…">
+  </div>
+  <select class="filter-sel" id="filterSel">
+    <option value="all">Tous</option>
+    <option value="pending">En attente</option>
+    <option value="success">Approuvés</option>
+    <option value="rejected">Refusés</option>
+  </select>
+</div>
+
+<div class="section-label">
+  <div class="section-title">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="var(--g2)"><path d="M2 12l20-9-9 20-2-9-9-2z"/></svg>
+    Demandes de retrait
+    <span class="count-pill" id="countPill">0</span>
+  </div>
+  <button class="btn-reject-all" id="btnRejectAll" type="button">
+    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    Refuser tout
+  </button>
+</div>
+
+<div class="withdraw-list" id="withdrawList"></div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-icon" id="modalIcon">✅</div>
+    <div class="modal-title" id="modalTitle">Confirmer</div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" id="modalCancel" type="button">Annuler</button>
+      <button class="modal-confirm" id="modalConfirm" type="button">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="bulkModalOverlay">
+  <div class="modal">
+    <div class="modal-icon">🚫</div>
+    <div class="modal-title">Refuser les retraits</div>
+    <div class="modal-body">
+      Saisissez un <strong>numéro de téléphone</strong> pour refuser uniquement les retraits en attente de ce numéro,
+      ou laissez vide pour <strong>refuser tous</strong> les retraits en attente.
+    </div>
+    <div class="bulk-reject-field">
+      <label class="bulk-reject-label" for="bulkRejectNum">Numéro d'opérateur (optionnel)</label>
+      <input class="bulk-reject-input" id="bulkRejectNum" type="tel" placeholder="Ex : 0700258392" autocomplete="off">
+      <div class="bulk-reject-hint">Si vide, <strong>toutes</strong> les demandes en attente seront refusées et les soldes recrédités.</div>
+    </div>
+    <div class="bulk-warning" id="bulkWarning"></div>
+    <div class="progress-bar-wrap" id="bulkProgress"><div class="progress-bar-fill" id="bulkProgressFill"></div></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" id="bulkCancel" type="button">Annuler</button>
+      <button class="modal-confirm danger" id="bulkConfirmBtn" type="button">🚫 Refuser</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import { getDatabase, ref, get, update, runTransaction } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+// Base Heineken uniquement
+const firebaseConfig = {
+  apiKey: "AIzaSyAVNLSc3JXWvTxiKk2n-mjmVUv39a_yuVM",
+  authDomain: "heineken-c174e.firebaseapp.com",
+  databaseURL: "https://heineken-c174e-default-rtdb.firebaseio.com",
+  projectId: "heineken-c174e",
+  storageBucket: "heineken-c174e.firebasestorage.app",
+  messagingSenderId: "756445276249",
+  appId: "1:756445276249:web:0989f661c0b97ef34be948"
+};
+const LOGIN_PAGE = "heineken-pro-v9.html";
+const FEE_PCT = 5;
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let allWithdrawals = [];
+let pendingAction = null;
+
+const OP_GRAD = {
+  MTN: 'linear-gradient(135deg,#ffd600,#ff9800)',
+  Moov: 'linear-gradient(135deg,#1565c0,#42a5f5)',
+  Orange: 'linear-gradient(135deg,#e65100,#ff8f00)',
+  Wave: 'linear-gradient(135deg,#283593,#5c6bc0)'
+};
+
+const fmt = n => Math.round(parseFloat(n) || 0).toLocaleString('fr-FR') + ' F';
+const escAttr = s => String(s ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const escHtml = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const formatDate = ts => {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) + ' · ' + d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+};
+const normStatus = s => ({ 'En attente':'pending', 'Approuvé':'success', 'Rejeté':'rejected' }[s] || 'pending');
+const digits = s => String(s || '').replace(/\s/g, '');
+
+const toastEl = document.getElementById('toast');
+const showToast = (msg, type = '') => {
+  toastEl.textContent = msg;
+  toastEl.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(() => toastEl.classList.remove('show'), 3500);
+};
+
+/* ── Lecture : tous les retraits depuis users/{uid}/withdrawals ── */
+async function loadAll() {
+  const snap = await get(ref(db, 'users'));
+  allWithdrawals = [];
+  if (snap.exists()) {
+    const users = snap.val();
+    for (const uid of Object.keys(users)) {
+      const u = users[uid] || {};
+      const ws = u.withdrawals || {};
+      for (const key of Object.keys(ws)) {
+        const w = ws[key] || {};
+        const amount = Number(w.amount) || 0;
+        const fee = w.fee ?? Math.round(amount * FEE_PCT / 100);
+        allWithdrawals.push({
+          id: key, userId: uid,
+          username: u.username || '',
+          owner: w.name || u.payout?.name || '',
+          operator: w.operator || u.payout?.operator || '',
+          number: w.phone || u.payout?.phone || '',
+          amount, fee, net: w.net ?? (amount - fee),
+          status: normStatus(w.status),
+          createdAt: w.createdAt || 0,
+          decidedAt: w.decidedAt || 0
+        });
+      }
+    }
+    allWithdrawals.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  }
+  updateSummary(allWithdrawals);
+  applyFilters();
+  const ov = document.getElementById('loadingOverlay');
+  ov.classList.add('hidden');
+  setTimeout(() => ov.style.display = 'none', 400);
+}
+
+/* ── Actions ── */
+async function approve(w) {
+  await update(ref(db, `users/${w.userId}/withdrawals/${w.id}`), { status: 'Approuvé', decidedAt: Date.now() });
+}
+async function reject(w) {
+  const wref = ref(db, `users/${w.userId}/withdrawals/${w.id}`);
+  const st = await get(wref);
+  if (!st.exists() || st.val().status !== 'En attente') return false; // déjà traité
+  await runTransaction(ref(db, `users/${w.userId}/balance`), b => (b || 0) + w.amount);
+  await runTransaction(ref(db, `users/${w.userId}/totalRetrait`), t => Math.max(0, (t || 0) - w.amount));
+  await update(wref, { status: 'Rejeté', decidedAt: Date.now(), refunded: true });
+  return true;
+}
+
+window.closeModal = () => {
+  document.getElementById('modalOverlay').classList.remove('open');
+  pendingAction = null;
+};
+function openModal(icon, title, body, btnText, danger) {
+  document.getElementById('modalIcon').textContent = icon;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  const b = document.getElementById('modalConfirm');
+  b.textContent = btnText;
+  b.className = 'modal-confirm' + (danger ? ' danger' : '');
+  document.getElementById('modalOverlay').classList.add('open');
+}
+window.openApprove = w => {
+  pendingAction = { type: 'approve', w };
+  openModal('✅', 'Approuver le retrait',
+    `Confirmer le retrait de <strong>${fmt(w.amount)}</strong> pour <strong>${escHtml(w.owner)}</strong> vers <strong>${escHtml(w.number)}</strong> (${escHtml(w.operator)}) ?`,
+    'Approuver', false);
+};
+window.openReject = w => {
+  pendingAction = { type: 'reject', w };
+  openModal('❌', 'Rejeter le retrait',
+    `Rejeter la demande de <strong>${fmt(w.amount)}</strong> de <strong>${escHtml(w.owner)}</strong> ? Le montant sera <strong>recrédité</strong> sur son solde.`,
+    'Rejeter', true);
+};
+
+document.getElementById('modalCancel').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target.id === 'modalOverlay') closeModal(); });
+document.getElementById('modalConfirm').addEventListener('click', async () => {
+  if (!pendingAction) return;
+  const { type, w } = pendingAction;
+  closeModal();
+  try {
+    if (type === 'approve') {
+      await approve(w);
+      showToast('✅ Retrait approuvé', 'success');
+    } else {
+      const ok = await reject(w);
+      showToast(ok ? '❌ Retrait rejeté — solde recrédité' : 'Cette demande a déjà été traitée', ok ? 'error' : 'warning');
+    }
+    await loadAll();
+  } catch (e) {
+    console.error(e);
+    showToast('Erreur lors du traitement', 'error');
+  }
+});
+
+/* ── Refuser tout / par numéro ── */
+const bulkOverlay = document.getElementById('bulkModalOverlay');
+const pendingList = () => allWithdrawals.filter(w => w.status === 'pending');
+function setBulkWarning(text, kind) {
+  const el = document.getElementById('bulkWarning');
+  el.textContent = text;
+  el.classList.add('visible');
+  el.style.color = kind === 'ok' ? 'var(--success)' : kind === 'no' ? 'var(--rejected)' : '';
+  el.style.background = kind === 'ok' ? 'var(--success-bg)' : kind === 'no' ? 'var(--rejected-bg)' : '';
+  el.style.borderColor = kind === 'ok' ? 'var(--success-border)' : kind === 'no' ? 'var(--rejected-border)' : '';
+}
+function bulkTargets() {
+  const val = digits(document.getElementById('bulkRejectNum').value.trim());
+  const pend = pendingList();
+  if (!val) return pend;
+  return pend.filter(w => { const n = digits(w.number); return n === val || n.endsWith(val); });
+}
+function refreshBulkWarning() {
+  const val = digits(document.getElementById('bulkRejectNum').value.trim());
+  const t = bulkTargets();
+  if (!val) return setBulkWarning(`⚠️ ${t.length} demande(s) en attente seront toutes refusées et les soldes recrédités.`);
+  if (!t.length) return setBulkWarning('❌ Aucun retrait en attente pour ce numéro.', 'no');
+  const total = t.reduce((s, w) => s + w.amount, 0);
+  setBulkWarning(`✅ ${t.length} retrait(s) trouvé(s) pour ce numéro — Total : ${fmt(total)}`, 'ok');
+}
+document.getElementById('btnRejectAll').addEventListener('click', () => {
+  if (!pendingList().length) return showToast('Aucune demande en attente à refuser.', 'warning');
+  document.getElementById('bulkRejectNum').value = '';
+  document.getElementById('bulkProgress').classList.remove('visible');
+  document.getElementById('bulkProgressFill').style.width = '0%';
+  const b = document.getElementById('bulkConfirmBtn');
+  b.disabled = false; b.textContent = '🚫 Refuser';
+  refreshBulkWarning();
+  bulkOverlay.classList.add('open');
+});
+document.getElementById('bulkRejectNum').addEventListener('input', refreshBulkWarning);
+document.getElementById('bulkCancel').addEventListener('click', () => bulkOverlay.classList.remove('open'));
+bulkOverlay.addEventListener('click', e => { if (e.target === bulkOverlay) bulkOverlay.classList.remove('open'); });
+document.getElementById('bulkConfirmBtn').addEventListener('click', async () => {
+  const targets = bulkTargets();
+  if (!targets.length) return showToast('❌ Aucun retrait en attente pour ce numéro.', 'error');
+  const btn = document.getElementById('bulkConfirmBtn');
+  const fill = document.getElementById('bulkProgressFill');
+  btn.disabled = true; btn.textContent = '⏳ En cours…';
+  document.getElementById('bulkProgress').classList.add('visible');
+  let done = 0, errors = 0;
+  for (const w of targets) {
+    try { await reject(w); } catch (e) { console.error(e); errors++; }
+    done++;
+    fill.style.width = Math.round(done / targets.length * 100) + '%';
+  }
+  bulkOverlay.classList.remove('open');
+  await loadAll();
+  if (errors === 0) showToast(`🚫 ${done} retrait(s) refusé(s) — soldes recrédités`, 'error');
+  else showToast(`⚠️ ${done - errors}/${done} refusé(s) (${errors} erreur(s))`, 'warning');
+});
+
+/* ── Filtres ── */
+function applyFilters() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const sel = document.getElementById('filterSel').value;
+  const list = allWithdrawals.filter(w => {
+    const hay = [w.owner, w.number, w.operator, w.userId, w.amount].map(v => String(v ?? '').toLowerCase()).join(' ');
+    return (sel === 'all' || w.status === sel) && (!q || hay.includes(q));
+  });
+  renderList(list);
+}
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('filterSel').addEventListener('change', applyFilters);
+
+/* ── Rendu ── */
+function renderList(list) {
+  document.getElementById('countPill').textContent = list.length;
+  document.getElementById('btnRejectAll').disabled = !pendingList().length;
+  const container = document.getElementById('withdrawList');
+  if (!list.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Aucun retrait trouvé</div><div class="empty-sub">Aucun résultat pour ce filtre ou cette recherche.</div></div>`;
+    return;
+  }
+  container.innerHTML = list.map((w, idx) => {
+    const st = w.status;
+    const stLabel = { pending:'⏳ En attente', success:'✅ Approuvé', rejected:'❌ Rejeté' }[st];
+    const actions = st === 'pending'
+      ? `<button class="btn-approve" data-act="approve" data-i="${escAttr(allWithdrawals.indexOf(w))}" type="button">
+           <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Approuver</button>
+         <button class="btn-reject" data-act="reject" data-i="${escAttr(allWithdrawals.indexOf(w))}" type="button">
+           <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg> Rejeter</button>`
+      : `<div class="btn-done">${stLabel}</div>`;
+    const op = w.operator || '—';
+    return `
+    <div class="wd-card status-${st}" style="animation-delay:${idx * .05}s">
+      <div class="wd-top">
+        <div class="wd-left">
+          <div class="wd-user">👤 ${escHtml(w.owner || 'Utilisateur inconnu')}</div>
+          <div class="wd-amount">${fmt(w.amount)}</div>
+          <div class="wd-net">Net à envoyer : <strong>${fmt(w.net)}</strong></div>
+        </div>
+        <div class="status-badge ${st}"><span class="status-dot ${st}"></span> ${stLabel}</div>
+      </div>
+      <div class="wd-divider"></div>
+      <div class="wd-info-grid">
+        <div class="wd-info-item">
+          <div class="info-label">📱 Numéro</div>
+          <div class="info-val">${escHtml(w.number || '—')}
+            <span class="copy-btn" data-copy="${escAttr(digits(w.number))}">
+              <svg viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3v14h2V3h12V1zm3 4H8C6.9 5 6 5.9 6 7v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            </span></div>
+        </div>
+        <div class="wd-info-item">
+          <div class="info-label">📡 Opérateur</div>
+          <div class="info-val"><span class="op-pill" style="background:${OP_GRAD[op] || '#555'}">${escHtml(op)}</span></div>
+        </div>
+        <div class="wd-info-item">
+          <div class="info-label">💸 Frais (5 %)</div>
+          <div class="info-val" style="color:var(--rejected)">${fmt(w.fee)}</div>
+        </div>
+        <div class="wd-info-item">
+          <div class="info-label">💰 Montant net</div>
+          <div class="info-val" style="color:var(--success)">${fmt(w.net)}</div>
+        </div>
+        <div class="wd-info-item">
+          <div class="info-label">👤 Compte</div>
+          <div class="info-val" style="font-size:10px;color:var(--muted)">${escHtml(w.username || '—')}</div>
+        </div>
+        <div class="wd-info-item">
+          <div class="info-label">🆔 ID demande</div>
+          <div class="info-val" style="font-size:10px;color:var(--muted)">${escHtml(String(w.id || '—').substring(0, 14))}…</div>
+        </div>
+      </div>
+      <div class="wd-divider"></div>
+      <div class="wd-actions">
+        <div class="wd-date">📅 ${formatDate(w.createdAt)}</div>
+        ${actions}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Délégation : boutons Approuver / Rejeter et copie du numéro
+document.getElementById('withdrawList').addEventListener('click', e => {
+  const copy = e.target.closest('.copy-btn');
+  if (copy) {
+    navigator.clipboard.writeText(copy.dataset.copy).then(() => {
+      const n = document.getElementById('copyNotif');
+      n.classList.add('show'); setTimeout(() => n.classList.remove('show'), 1800);
+    }).catch(() => {});
+    return;
+  }
+  const b = e.target.closest('button[data-act]');
+  if (!b) return;
+  const w = allWithdrawals[Number(b.dataset.i)];
+  if (!w) return;
+  if (b.dataset.act === 'approve') window.openApprove(w);
+  else window.openReject(w);
+});
+
+function updateSummary(list) {
+  const pend = list.filter(w => w.status === 'pending');
+  const ok = list.filter(w => w.status === 'success');
+  const no = list.filter(w => w.status === 'rejected');
+  const sum = arr => arr.reduce((s, w) => s + w.amount, 0);
+  document.getElementById('cntAll').textContent = list.length;
+  document.getElementById('cntPending').textContent = pend.length;
+  document.getElementById('cntSuccess').textContent = ok.length;
+  document.getElementById('cntRejected').textContent = no.length;
+  document.getElementById('totalAmt').innerHTML = `${Math.round(sum(list)).toLocaleString('fr-FR')} <span>F</span>`;
+  document.getElementById('totalPending').textContent = Math.round(sum(pend)).toLocaleString('fr-FR') + ' F';
+}
+
+/* ── Accès : compte avec isAdmin: true ── */
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href = LOGIN_PAGE; return; }
+  try {
+    const flag = await get(ref(db, `users/${user.uid}/isAdmin`));
+    if (flag.val() !== true) {
+      document.getElementById('loadingOverlay').style.display = 'none';
+      document.getElementById('withdrawList').innerHTML = `<div class="empty-state"><div class="empty-icon">🔒</div><div class="empty-title">Accès réservé</div><div class="empty-sub">Ce compte n'est pas administrateur.</div></div>`;
+      return;
+    }
+    await loadAll();
+  } catch (e) {
+    showToast('Erreur de chargement : ' + e.message, 'error');
+  }
+});
+</script>
+</body>
+</html>

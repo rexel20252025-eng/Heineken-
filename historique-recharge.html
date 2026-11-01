@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Heineken — Historique de recharge</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#fff;min-height:100vh;display:flex;justify-content:center;background:radial-gradient(circle at 20% 0%,#1fa452 0%,transparent 45%),radial-gradient(circle at 90% 100%,#0a4f20 0%,transparent 50%),linear-gradient(170deg,#00782a 0%,#00602a 60%,#004a20 100%);background-attachment:fixed}
+.app{width:100%;max-width:400px;padding:16px 16px 40px}
+.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.back{color:#fff;text-decoration:none;font-size:13px;font-weight:800;opacity:.9;display:flex;align-items:center;gap:6px}
+.back svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.brand{font-size:14px;font-weight:900;letter-spacing:2.5px}
+.brand span{color:#ff5a5f}
+
+.summary{position:relative;overflow:hidden;border-radius:22px;padding:18px;margin-bottom:14px;background:linear-gradient(135deg,#1b1404 0%,#4a3300 40%,#c98a12 75%,#ffd76a 100%);border:1px solid rgba(255,235,170,.7);box-shadow:0 14px 30px rgba(0,0,0,.35),0 0 26px rgba(255,215,106,.3)}
+.summary::before{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.4),transparent 70%)}
+.summary .k{font-size:11px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;color:#ffe9a0;position:relative}
+.summary .v{font-size:32px;font-weight:900;color:#fff7de;margin-top:4px;text-shadow:0 0 18px rgba(255,215,106,.6);position:relative}
+.summary .v span{font-size:16px;color:#ffd76a}
+.summary .sub{font-size:12px;color:#ffe9a0;margin-top:4px;position:relative;opacity:.9}
+
+.htitle{display:flex;align-items:center;gap:10px;margin:4px 0 12px;font-size:10px;font-weight:900;letter-spacing:1.6px;text-transform:uppercase;color:#ffe9a0}
+.htitle::before{content:"";width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#ffd76a;box-shadow:0 0 0 3px rgba(255,215,106,.22),0 0 12px rgba(255,215,106,.6)}
+.htitle::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(255,215,106,.7),rgba(255,215,106,0))}
+.hcount{font-style:normal;min-width:24px;padding:3px 9px;border-radius:999px;text-align:center;font-size:11px;font-weight:900;color:#3d2500;background:linear-gradient(135deg,#ffe9a0,#ffd76a 45%,#f5b82e)}
+
+#hList{display:flex;flex-direction:column;gap:10px}
+.rcard{position:relative;overflow:hidden;isolation:isolate;padding:14px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.2),rgba(255,255,255,.05) 60%,rgba(215,25,32,.2));border:1px solid rgba(255,255,255,.25);box-shadow:0 10px 22px rgba(0,0,0,.2)}
+.rcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#ffb84d,#f59e0b)}
+.rcard.is-ok::before{background:linear-gradient(180deg,#7cffb2,#1ebe5a)}
+.rcard.is-no::before{background:linear-gradient(180deg,#ff5a5f,#d71920)}
+.rtop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+.ramt{font-size:22px;font-weight:900;color:#ffd76a}
+.ramt span{font-size:13px}
+.rright{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.op{font-size:10px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25)}
+.op.op-moov{background:linear-gradient(135deg,#2563eb,#1e40af);border-color:transparent}
+.op.op-orange{background:linear-gradient(135deg,#ff7a00,#e05d00);border-color:transparent}
+.op.op-mtn{background:linear-gradient(135deg,#ffcc00,#e0b000);color:#3d2500;border-color:transparent}
+.op.op-wave{background:linear-gradient(135deg,#1dc8e8,#0aa6c8);border-color:transparent}
+.badge{font-size:9px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:linear-gradient(135deg,#ffb84d,#f59e0b);color:#3d2500}
+.badge.ok{background:linear-gradient(135deg,#34e07a,#1ebe5a);color:#fff}
+.badge.no{background:linear-gradient(135deg,#ff5a5f,#d71920);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cell{padding:7px 9px;border-radius:11px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);min-width:0}
+.cell.wide{grid-column:1 / -1}
+.cell span{display:block;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;opacity:.75;margin-bottom:2px}
+.cell b{display:block;font-size:12px;font-weight:800;word-break:break-word}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:1px}
+.empty{text-align:center;padding:30px 10px;font-size:13px;opacity:.85;border-radius:18px;background:rgba(255,255,255,.08);border:1px dashed rgba(255,255,255,.3)}
+.cta{display:block;text-align:center;margin-top:16px;padding:14px;border-radius:16px;background:linear-gradient(135deg,#ffe9a0,#ffd76a 45%,#f5b82e);color:#3d2500;font-size:15px;font-weight:900;text-decoration:none;box-shadow:0 10px 22px rgba(245,184,46,.4)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bar">
+    <a class="back" href="compte.html"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg> Retour</a>
+    <div class="brand">HEINEKEN<span>★</span></div>
+  </div>
+
+  <div class="summary">
+    <div class="k">Total rechargé</div>
+    <div class="v" id="tot">0 <span>F</span></div>
+    <div class="sub" id="totSub">Recharges validées</div>
+  </div>
+
+  <div class="htitle"><span>Historique recharge</span><em class="hcount" id="hCount">0</em></div>
+  <div id="hList"><div class="empty">Chargement de vos recharges…</div></div>
+  <a class="cta" href="recharge.html">+ Nouvelle recharge</a>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAVNLSc3JXWvTxiKk2n-mjmVUv39a_yuVM",
+  authDomain: "heineken-c174e.firebaseapp.com",
+  databaseURL: "https://heineken-c174e-default-rtdb.firebaseio.com",
+  projectId: "heineken-c174e",
+  storageBucket: "heineken-c174e.firebasestorage.app",
+  messagingSenderId: "756445276249",
+  appId: "1:756445276249:web:0989f661c0b97ef34be948"
+};
+const LOGIN_PAGE = "heineken-pro-v9.html";
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const $ = id => document.getElementById(id);
+const fmt = n => Math.round(Number(n) || 0).toLocaleString("fr-FR");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtDate = t => t ? new Date(t).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
+
+const STATUS = {
+  "En attente":      { cls: "",   kind: "" },
+  "En vérification": { cls: "",   kind: "" },
+  "Validé":          { cls: "ok", kind: "ok" },
+  "Annulé":          { cls: "no", kind: "no" }
+};
+
+function render(items) {
+  $("hCount").textContent = items.length;
+  const validated = items.filter(r => r.status === "Validé").reduce((t, r) => t + (Number(r.amount) || 0), 0);
+  const nb = items.filter(r => r.status === "Validé").length;
+  $("tot").innerHTML = fmt(validated) + ' <span>F</span>';
+  $("totSub").textContent = nb ? `${nb} recharge${nb > 1 ? "s" : ""} validée${nb > 1 ? "s" : ""}` : "Aucune recharge validée";
+
+  if (!items.length) {
+    $("hList").innerHTML = '<div class="empty">Aucune recharge pour le moment.</div>';
+    return;
+  }
+  $("hList").innerHTML = items.map(r => {
+    const st = STATUS[r.status] || { cls: "", kind: "" };
+    const op = (r.operator || "").toLowerCase();
+    const kind = st.kind === "ok" ? "is-ok" : st.kind === "no" ? "is-no" : "";
+    return `
+    <div class="rcard ${kind}">
+      <div class="rtop">
+        <div><div class="ramt">${fmt(r.amount)} <span>F</span></div></div>
+        <div class="rright">
+          <span class="op op-${esc(op)}">${esc(r.operator) || "—"}</span>
+          <span class="badge ${st.cls}">${esc(r.status)}</span>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="cell"><span>Date</span><b>${fmtDate(r.createdAt)}</b></div>
+        <div class="cell"><span>Numéro de dépôt</span><b class="mono">${esc(r.fromPhone) || "—"}</b></div>
+        <div class="cell wide"><span>Id de transaction</span><b class="mono">${esc(r.txId) || "—"}</b></div>
+        ${r.paidAt ? `<div class="cell wide"><span>Payé le</span><b>${fmtDate(r.paidAt)}</b></div>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+onAuthStateChanged(auth, user => {
+  if (!user) { window.location.href = LOGIN_PAGE; return; }
+  onValue(ref(db, `users/${user.uid}/recharges`), snap => {
+    const v = snap.exists() ? snap.val() : {};
+    const items = Object.keys(v).map(k => ({ key: k, ...v[k] })).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    render(items);
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Heineken — Assistante</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#0d2a18;height:100vh;height:100dvh;display:flex;justify-content:center;background:radial-gradient(circle at 15% 0%,#1fa452 0%,transparent 45%),linear-gradient(170deg,#00782a 0%,#00602a 60%,#004a22 100%);background-attachment:fixed}
+.app{width:100%;max-width:440px;height:100%;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:12px;padding:14px 16px;color:#fff}
+.back{color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.14)}
+.back svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ffe9a0,#ffd76a 45%,#f5b82e);display:flex;align-items:center;justify-content:center;color:#3d2500;font-weight:900;font-size:16px}
+.who{flex:1;min-width:0}
+.who b{display:block;font-size:15px;font-weight:900}
+.who span{font-size:11px;opacity:.85;display:flex;align-items:center;gap:6px}
+.who span::before{content:"";width:7px;height:7px;border-radius:50%;background:#7cffb2}
+.chat{flex:1;overflow-y:auto;padding:6px 14px 10px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.msg{max-width:84%;padding:11px 14px;border-radius:18px;font-size:14px;line-height:1.5;white-space:pre-line;box-shadow:0 6px 14px rgba(0,0,0,.15)}
+.msg.bot{align-self:flex-start;background:#fff;color:#0d2a18;border-bottom-left-radius:6px}
+.msg.me{align-self:flex-end;background:linear-gradient(135deg,#ffe9a0,#ffd76a 45%,#f5b82e);color:#3d2500;font-weight:700;border-bottom-right-radius:6px}
+.typing{align-self:flex-start;background:#fff;border-radius:18px;padding:12px 14px;display:flex;gap:4px}
+.typing i{width:7px;height:7px;border-radius:50%;background:#6b8070;animation:bl 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}
+.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bl{0%,100%{opacity:.3}50%{opacity:1}}
+.wa{align-self:flex-start;max-width:84%;display:flex;flex-direction:column;gap:6px}
+.wa a,.wa button{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 16px;border-radius:16px;border:0;background:#25d366;color:#fff;font-size:14px;font-weight:900;text-decoration:none;box-shadow:0 10px 20px rgba(0,0,0,.25);cursor:pointer;font-family:inherit}
+.wa button:disabled{opacity:.5;cursor:default}
+.wa small{font-size:11px;color:#ffe9a0;padding-left:4px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:0 14px 8px}
+.chip{flex:0 0 auto;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap}
+.chip:active{transform:scale(.97)}
+.inputbar{display:flex;gap:8px;padding:10px 14px calc(12px + env(safe-area-inset-bottom));background:rgba(0,50,22,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.inputbar input{flex:1;min-width:0;padding:13px 14px;border:0;border-radius:999px;font-size:15px;font-family:inherit;outline:none;color:#0d2a18;background:#fff}
+.inputbar button{width:48px;height:48px;border:0;border-radius:50%;background:linear-gradient(135deg,#ffe9a0,#ffd76a 45%,#f5b82e);color:#3d2500;font-size:18px;font-weight:900;cursor:pointer;flex:0 0 48px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bar">
+    <a class="back" href="compte.html" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></a>
+    <div class="av">A</div>
+    <div class="who"><b>Assistante Heineken</b><span>En ligne</span></div>
+  </div>
+
+  <div class="chat" id="chat"></div>
+
+  <div class="chips">
+    <button class="chip" data-q="Comment m'inscrire ?">Inscription</button>
+    <button class="chip" data-q="Quelles sont les formules et combien je gagne ?">Formules</button>
+    <button class="chip" data-q="Quand sont crédités les bénéfices ?">Bénéfices</button>
+    <button class="chip" data-q="Comment fonctionne le parrainage ?">Parrainage</button>
+    <button class="chip" data-q="Comment recharger mon compte ?">Recharger</button>
+    <button class="chip" data-q="Comment retirer mon argent ?">Retirer</button>
+    <button class="chip" data-q="Je veux parler au responsable technique">Responsable technique</button>
+  </div>
+
+  <form class="inputbar" id="form">
+    <input id="inp" type="text" placeholder="Posez votre question…" autocomplete="off" maxlength="300">
+    <button id="send" type="submit" aria-label="Envoyer">➤</button>
+  </form>
+</div>
+
+<script>
+/* À RENSEIGNER : numéro WhatsApp du responsable technique, avec l'indicatif pays, sans + ni espaces.
+   Exemple : "2250700000000". Tant qu'il est vide, le bouton WhatsApp reste désactivé. */
+const WA_NUMBER = "";
+
+const chat = document.getElementById("chat");
+const form = document.getElementById("form");
+const inp = document.getElementById("inp");
+let awaitingName = false;
+let fullName = "";
+
+/* Base de réponses. Chaque entrée : des mots-clés (sans accents, en minuscules) et une réponse.
+   La réponse retenue est celle qui contient le plus de mots-clés trouvés dans la question. */
+const KB = [
+  // Salutations
+  { k: ["bonjour", "salut", "bonsoir", "hello", "coucou", "salam"],
+    a: "Bonjour ! Je suis l'assistante Heineken. Posez-moi votre question sur la plateforme : inscription, boissons, bénéfices, parrainage, recharge, retrait ou historique." },
+  { k: ["merci", "thanks", "super", "ok merci", "c'est bon"],
+    a: "Avec plaisir ! Si vous avez une autre question, je suis là." },
+  { k: ["au revoir", "bye", "a bientot", "à bientôt", "bonne journee", "bonne journée", "bonne soiree", "bonne soirée"],
+    a: "Au revoir et bonne journée ! Revenez quand vous voulez." },
+
+  // Identité et présentation
+  { k: ["qui etes", "qui es", "qui tu", "vous etes", "tu es", "presente", "tu t'appelles", "vous vous appelez", "ton nom", "votre nom", "qui est", "es-tu", "etes-vous"],
+    a: "Je suis l'assistante Heineken de la plateforme Là Boissons. Je réponds à vos questions sur le fonctionnement de la plateforme. Pour parler à une personne, je peux vous mettre en contact avec le responsable technique." },
+  { k: ["c'est quoi", "cest quoi", "a quoi sert", "qu'est ce que", "quest ce que", "la plateforme", "comment ca marche", "fonctionne", "explique", "presentation"],
+    a: "Là boisson heineken est une plateforme où vous investissez dans des boisson heineken de boissons. Chaque boisson heineken vous rapporte un bénéfice chaque jour à 00h00 pendant son cycle. Vous pouvez aussi recharger votre compte, retirer vos gains et parrainer d'autres personnes." },
+
+  // Inscription et connexion
+  { k: ["inscri", "creer", "s'enregistrer", "enregistrer", "nouveau", "nouvelle", "ouvrir un compte", "ouvrir mon compte", "creation"],
+    a: "Pour vous inscrire, choisissez « Inscription » et suivez les étapes : numéro de téléphone, mot de passe et vos informations. Si vous avez reçu un lien de parrainage, le code de votre parrain est appliqué automatiquement." },
+  { k: ["parrain", "code", "lien de parrainage"],
+    a: "Si vous avez un lien de parrainage, ouvrez-le pour que le code de votre parrain soit appliqué à l'inscription. Sans lien, vous pouvez vous inscrire normalement." },
+  { k: ["connect", "connexion", "login", "se connecter", "mot de passe", "mdp", "password", "oublie", "oublié", "mot de passe oublie"],
+    a: "Connectez-vous avec votre numéro de téléphone et votre mot de passe. Si vous avez oublié votre mot de passe, contactez le responsable technique pour être aidé." },
+  { k: ["deconnect", "déconnect", "deconnecter", "se deconnecter", "logout", "sortir"],
+    a: "Pour vous déconnecter, ouvrez la page Compte et touchez « Déconnecter du compte »." },
+  { k: ["gratuit", "frais d'inscription", "payer pour", "cout", "coût", "prix de l'inscription"],
+    a: "L'inscription ne demande pas de paiement. Les sommes que vous versez concernent uniquement les recharges et les palettes que vous choisissez." },
+
+  // Palettes
+  { k: ["palette", "palettes", "investis", "investir", "investissement", "louer", "location", "louer une palette", "choisir"],
+    a: "Il y a six formules de boissons. Pour en louer une, le montant de la mise est débité de votre solde. Vous ne pouvez avoir qu'une formule active à la fois.\n\nVoici les six formules (mise, bénéfice par jour, durée, total reçu) :\n\nFormule 1 : 5 500 F, 950 F par jour pendant 19 jours (total 18 050 F)\nFormule 2 : 12 500 F, 2 500 F par jour pendant 18 jours (total 45 000 F)\nFormule 3 : 30 500 F, 5 000 F par jour pendant 15 jours (total 75 000 F)\nFormule 4 : 50 500 F, 10 000 F par jour pendant 15 jours (total 150 000 F)\nFormule 5 : 100 000 F, 25 000 F par jour pendant 15 jours (total 375 000 F)\nFormule 6 : 150 000 F, 36 740 F par jour pendant 15 jours (total 551 100 F)" },
+  { k: ["combien", "gagner", "gain", "rapporte", "rendement", "benefice", "bénéfice", "tarif", "prix", "montant"],
+    a: "Voici les six formules (mise, bénéfice par jour, durée, total reçu) :\n\nFormule 1 : 5 500 F, 950 F par jour pendant 19 jours (total 18 050 F)\nFormule 2 : 12 500 F, 2 500 F par jour pendant 18 jours (total 45 000 F)\nFormule 3 : 30 500 F, 5 000 F par jour pendant 15 jours (total 75 000 F)\nFormule 4 : 50 500 F, 10 000 F par jour pendant 15 jours (total 150 000 F)\nFormule 5 : 100 000 F, 25 000 F par jour pendant 15 jours (total 375 000 F)\nFormule 6 : 150 000 F, 36 740 F par jour pendant 15 jours (total 551 100 F)" },
+  { k: ["solde insuffisant", "pas assez", "insuffisant", "pas assez d'argent", "rien sur mon solde", "pas de solde"],
+    a: "Si votre solde est insuffisant, la location est refusée. Rechargez votre compte, puis louez la palette de votre choix." },
+  { k: ["termine", "expire", "expiration", "cycle", "duree", "combien de jours"],
+    a: "Chaque formule a une durée de cycle en jours, indiquée sur la page Accueil. Une fois le cycle terminé, vous pouvez en louer une nouvelle." },
+
+  // Bénéfices
+  { k: ["miner", "mine", "recuperer", "récupérer", "encaisser les benefices", "bouton", "miner mes benefices"],
+    a: "Ouvrez la page Boissons et touchez « Miner mes bénéfices » pour récupérer les bénéfices disponibles. Ils sont ensuite ajoutés à votre solde." },
+  { k: ["minuit", "quand", "heure", "tous les jours", "chaque jour", "journalier", "quotidien", "credit", "crédité", "crédite", "crédit", "benefice", "bénéfice"],
+    a: "Les bénéfices sont générés chaque jour à 00h00, heure d'Abidjan. Ils restent disponibles jusqu'à ce que vous les récupériez depuis la page Boissons." },
+  { k: ["oublie de miner", "pas recu", "pas reçu", "bénéfice manquant", "benefice manquant", "pas apparu", "n'apparait pas", "apparait pas", "pas ajouté"],
+    a: "Si un bénéfice n'apparaît pas, vérifiez la page Boissons et touchez « Miner mes bénéfices ». Si le problème continue, demandez l'aide du responsable technique." },
+
+  // Parrainage
+  { k: ["parrainage", "parrain", "partage", "lien", "filleul", "filleuls", "commission", "commissions", "inviter", "invitation", "partager"],
+    a: "Partagez votre lien de parrainage depuis la page Partage. Vous recevez une commission sur les investissements de vos filleuls : 10 % pour le niveau 1, 5 % pour le niveau 2 et 2 % pour le niveau 3." },
+  { k: ["voir mes filleuls", "mes filleuls", "combien de filleuls", "mes parrainages", "statistiques", "stats"],
+    a: "Vous voyez vos filleuls et vos commissions sur la page Partage, avec le nombre de personnes de chaque niveau." },
+
+  // Recharge
+  { k: ["recharg", "depot", "dépôt", "deposer", "déposer", "approvisionner", "ajouter de l'argent", "mettre de l'argent", "alimenter"],
+    a: "Pour recharger : choisissez l'opérateur (Wave, MTN, Orange ou Moov) et le montant. Payez au numéro affiché, puis saisissez votre numéro de dépôt et l'id de transaction. Vous avez 10 minutes pour valider le paiement, sinon la demande est annulée." },
+  { k: ["wave", "mtn", "orange", "moov", "operateur", "opérateur", "mobile money"],
+    a: "Vous pouvez recharger avec Wave, MTN, Orange ou Moov. Choisissez l'opérateur sur la page Recharge, puis payez au numéro affiché pour cet opérateur." },
+  { k: ["j'ai recharge", "j'ai rechargé", "jai recharge", "ai recharge", "pas encore recu", "pas encore reçu", "toujours pas", "transfert", "transfere", "transféré", "j'ai transfere", "j'ai transféré", "j'ai paye", "j'ai payé", "envoye", "envoyé", "au service", "service"],
+    a: "Si vous avez rechargé et que votre solde n'a pas encore changé, ne vous inquiétez pas : la vérification prend un peu de temps après votre paiement.\n\nVérifiez d'abord le statut sur la page Historique de recharge :\n• « En vérification » : votre paiement est en cours de contrôle, attendez encore.\n• « Validé » : le montant a été ajouté à votre solde.\n• « Annulé » : la demande a expiré (plus de 10 minutes) ou a été refusée.\n\nSi la demande est toujours « En vérification » après un moment, gardez votre id de transaction et votre numéro de dépôt, puis dites-moi « je veux parler au responsable technique » pour être mis en contact." },
+  { k: ["valider", "validation", "combien de temps", "delai", "délai", "attendre", "quand mon solde", "pas credite", "pas crédité", "pas recu mon argent"],
+    a: "Après avoir déclaré votre paiement, votre demande est vérifiée. Votre solde est crédité une fois la recharge validée. Vous pouvez suivre son statut sur la page Historique de recharge." },
+  { k: ["annule", "annulé", "annulee", "expiré", "10 minutes", "dix minutes", "temps écoulé", "temps ecoule"],
+    a: "Vous avez 10 minutes pour payer et déclarer la recharge. Passé ce délai, la demande est annulée automatiquement. Vous pouvez en refaire une nouvelle depuis la page Recharge." },
+  { k: ["numero de depot", "numéro de dépôt", "id transaction", "id de transaction", "transaction", "reference", "référence", "sms"],
+    a: "Le numéro de dépôt est celui qui vous a payé (votre numéro d'envoi). L'id de transaction est le code reçu par SMS après votre paiement. Les deux sont demandés pour valider la recharge." },
+
+  // Retrait
+  { k: ["retrait", "retirer", "retire", "encaisser", "sortir mon argent", "toucher mon argent", "recuperer mon argent"],
+    a: "Pour retirer : le montant minimum est de 1 000 F et les frais sont de 5 %. Il faut d'abord enregistrer votre compte de retrait (opérateur, numéro et nom) et votre code de retrait à 6 chiffres." },
+  { k: ["frais", "5 %", "5%", "pourcentage", "montant recu", "montant reçu", "combien je recois", "combien je reçois", "minimum", "1000", "1 000"],
+    a: "Les frais de retrait sont de 5 %. Le montant reçu est le montant demandé moins ces 5 %. Le retrait minimum est de 1 000 F." },
+  { k: ["code de retrait", "code retrait", "code secret", "code à 6", "6 chiffres", "mot de passe retrait"],
+    a: "Le code de retrait est un code à 6 chiffres que vous définissez sur la page Compte de retrait. Il vous est demandé à chaque retrait. Ne le communiquez à personne." },
+  { k: ["compte de retrait", "numero de retrait", "numéro de retrait", "operateur de retrait", "beneficiaire", "bénéficiaire"],
+    a: "Le compte de retrait regroupe l'opérateur, le numéro et le nom du bénéficiaire. Vous le renseignez sur la page Compte de retrait avant votre premier retrait." },
+  { k: ["rejet", "rejete", "rejeté", "refuse", "refusé", "refus", "annule mon retrait", "retrait refuse"],
+    a: "Si votre retrait est rejeté, le montant est remis sur votre solde. Vous pouvez vérifier le statut sur la page Historique de retrait." },
+  { k: ["delai retrait", "combien de temps retrait", "quand je recois", "quand je reçois", "quand mon retrait", "approuve", "approuvé", "statut du retrait"],
+    a: "Votre demande de retrait est vérifiée par l'équipe. Son statut change ensuite en « Approuvé » ou « Payé ». Suivez-le sur la page Historique de retrait." },
+
+  // Historique et solde
+  { k: ["historique", "historiques", "mes operations", "mes opérations", "mes recharges", "mes retraits"],
+    a: "Vos recharges sont dans « Historique de recharge » et vos retraits dans « Historique de retrait ». Ces deux pages sont accessibles depuis la page Compte." },
+  { k: ["solde", "mon solde", "argent disponible", "combien j'ai", "ou voir", "où voir", "montant disponible", "balance"],
+    a: "Votre solde est affiché sur la page d'accueil et sur la page Compte. Il augmente avec les recharges validées, les bénéfices récupérés et les commissions. Il diminue avec les locations de palettes et les retraits." },
+
+  // Sécurité et prudence
+  { k: ["securise", "sécurisé", "arnaque", "fiable", "risque", "perdre", "perte", "garanti", "garantie", "confiance"],
+    a: "Placer de l'argent comporte un risque de perte. Les gains dépendent du fonctionnement de la plateforme et ne sont pas garantis. Investissez seulement ce que vous pouvez vous permettre de perdre. Ne communiquez jamais votre mot de passe ni votre code de retrait." },
+
+  // Contact et technique
+  { k: ["aide", "probleme", "problème", "bug", "erreur", "ca marche pas", "ça marche pas", "bloque", "bloqué", "marche pas"],
+    a: "Je peux essayer de vous aider. Si le problème persiste, dites-moi « je veux parler au responsable technique » et je vous mets en contact sur WhatsApp." },
+];
+
+const HUMAN_KW = ["responsable", "technique", "humain", "whatsapp", "parler", "personne", "conseiller", "conseillere", "conseillère"];
+
+function plain(s) { return String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/’/g, "'"); }
+
+function addMsg(text, who = "bot") {
+  const d = document.createElement("div");
+  d.className = "msg " + who;
+  d.textContent = text;
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+}
+function typing(on) {
+  let t = document.getElementById("typing");
+  if (on && !t) {
+    t = document.createElement("div");
+    t.id = "typing"; t.className = "typing";
+    t.innerHTML = "<i></i><i></i><i></i>";
+    chat.appendChild(t);
+    chat.scrollTop = chat.scrollHeight;
+  } else if (!on && t) t.remove();
+}
+function botSay(text, delay = 450) {
+  typing(true);
+  return new Promise(res => setTimeout(() => { typing(false); addMsg(text, "bot"); res(); }, delay));
+}
+
+function answer(q) {
+  const n = plain(q);
+  let best = null, bestScore = 0;
+  for (const item of KB) {
+    let score = 0;
+    for (const k of item.k) {
+      const kk = plain(k);
+      if (kk && n.includes(kk)) score += kk.length >= 4 ? 2 : 1;
+    }
+    if (score > bestScore) { best = item; bestScore = score; }
+  }
+  return best ? best.a : null;
+}
+
+function waButton() {
+  const wrap = document.createElement("div");
+  wrap.className = "wa";
+  const btn = document.createElement("button");
+  btn.type = "button";
+  if (!WA_NUMBER) {
+    btn.textContent = "WhatsApp non configuré";
+    btn.disabled = true;
+    wrap.appendChild(btn);
+    const s = document.createElement("small");
+    s.textContent = "Le numéro du responsable technique n'a pas encore été renseigné.";
+    wrap.appendChild(s);
+  } else {
+    const msg = `Bonjour, je suis ${fullName}. Je souhaite parler au responsable technique de Là Boissons.`;
+    const a = document.createElement("a");
+    a.href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = "Ouvrir WhatsApp avec le responsable technique";
+    wrap.appendChild(a);
+  }
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function handleHuman() {
+  await botSay("Je vais vous mettre en contact avec le responsable technique. Quel est votre nom complet ?");
+  awaitingName = true;
+}
+
+async function handleUser(text) {
+  addMsg(text, "me");
+  if (awaitingName) {
+    const name = text.trim().replace(/\s+/g, " ");
+    if (name.length < 3) { await botSay("Merci d'écrire votre nom complet, prénom et nom."); return; }
+    fullName = name;
+    awaitingName = false;
+    await botSay(`Merci ${fullName}. Touchez le bouton ci-dessous pour ouvrir WhatsApp. Votre nom sera déjà dans le message.`);
+    waButton();
+    return;
+  }
+  const n = plain(text);
+  if (HUMAN_KW.some(k => n.includes(plain(k)))) { await handleHuman(); return; }
+  const a = answer(text);
+  if (a) { await botSay(a); return; }
+  await botSay("Je n'ai pas la réponse à cette question. Essayez de la reformuler, ou dites-moi « je veux parler au responsable technique » pour être mis en contact.");
+}
+
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  const t = inp.value.trim();
+  if (!t) return;
+  inp.value = "";
+  handleUser(t);
+});
+document.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => handleUser(c.dataset.q)));
+
+botSay("Bonjour, je suis l'assistante Heineken. Je peux répondre à vos questions sur le fonctionnement de la plateforme. Que voulez-vous savoir ?", 300);
+</script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Heineken — Validation des recharges</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#0d2a18;min-height:100vh;background:radial-gradient(circle at 15% 0%,#1fa452 0%,transparent 45%),linear-gradient(170deg,#00782a 0%,#00602a 60%,#004a22 100%);background-attachment:fixed}
+.app{max-width:440px;margin:0 auto;padding:16px 16px 40px}
+.bar{display:flex;align-items:center;justify-content:space-between;color:#fff;margin-bottom:14px}
+.brand{font-size:14px;font-weight:900;letter-spacing:2.5px}
+.brand span{color:#ff5a5f}
+.bar a{color:#fff;text-decoration:none;font-size:12px;font-weight:800;opacity:.85}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat{background:#fff;border-radius:18px;padding:14px;box-shadow:0 12px 24px rgba(0,0,0,.2)}
+.stat .k{font-size:10px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:#6b8070}
+.stat .v{font-size:20px;font-weight:900;margin-top:4px}
+.stat.gold{background:linear-gradient(135deg,#ffe9a0,#ffd76a 45%,#f5b82e)}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px}
+.tab{flex:0 0 auto;border:0;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:800;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;font-family:inherit}
+.tab.on{background:#fff;color:#00602a}
+.tab b{margin-left:4px;font-weight:900}
+.card{background:#fff;border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 12px 24px rgba(0,0,0,.2);position:relative}
+.card::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:0 4px 4px 0;background:#f5b82e}
+.card.ok::before{background:#1ebe5a}
+.card.no::before{background:#d71920}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+.who{font-size:14px;font-weight:900}
+.who small{display:block;font-size:11px;color:#6b8070;font-weight:700;margin-top:2px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.amt{font-size:20px;font-weight:900;color:#00782a;text-align:right}
+.amt small{font-size:12px}
+.badge{display:inline-block;margin-top:4px;font-size:9px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:#fff7e0;color:#8a5a00;border:1px solid #f5d98a}
+.badge.ok{background:#e9f9ef;color:#00602a;border-color:#a0ddb8}
+.badge.no{background:#fff0f0;color:#b82020;border-color:#f0a8a8}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.cell{background:#f3f7f4;border-radius:12px;padding:8px 10px;min-width:0}
+.cell.wide{grid-column:1 / -1}
+.cell span{display:block;font-size:9px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:#6b8070;margin-bottom:2px}
+.cell b{display:block;font-size:13px;font-weight:800;word-break:break-word;font-family:ui-monospace,Menlo,Consolas,monospace}
+.cell b.txt{font-family:inherit}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{border:0;border-radius:14px;padding:12px;font-size:14px;font-weight:900;cursor:pointer;font-family:inherit}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.ok{background:linear-gradient(135deg,#00782a,#25b96a);color:#fff}
+.btn.no{background:#fff0f0;color:#b82020;border:1px solid #f0a8a8}
+.empty{text-align:center;color:#fff;padding:40px 16px;font-size:14px;opacity:.9}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#fff;color:#00602a;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:800;box-shadow:0 8px 20px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.toast.show{opacity:1}
+.toast.err{color:#b82020}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bar">
+    <div class="brand">HEINEKEN<span>★</span></div>
+    <a href="compte.html">Retour au compte</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="k">À valider</div><div class="v" id="sPend">0</div></div>
+    <div class="stat gold"><div class="k">Montant en attente</div><div class="v" id="sPendAmt">0 F</div></div>
+    <div class="stat"><div class="k">Validées</div><div class="v" id="sOk">0</div></div>
+    <div class="stat"><div class="k">Total crédité</div><div class="v" id="sTot">0 F</div></div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-f="En vérification">À valider <b id="cPend">0</b></button>
+    <button class="tab" data-f="Validé">Validées <b id="cOk">0</b></button>
+    <button class="tab" data-f="Annulé">Annulées <b id="cNo">0</b></button>
+    <button class="tab" data-f="En attente">En attente <b id="cWait">0</b></button>
+    <button class="tab" data-f="Tous">Tous</button>
+  </div>
+
+  <div id="list"><div class="empty">Chargement…</div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import { getDatabase, ref, get, update, runTransaction } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAVNLSc3JXWvTxiKk2n-mjmVUv39a_yuVM",
+  authDomain: "heineken-c174e.firebaseapp.com",
+  databaseURL: "https://heineken-c174e-default-rtdb.firebaseio.com",
+  projectId: "heineken-c174e",
+  storageBucket: "heineken-c174e.firebasestorage.app",
+  messagingSenderId: "756445276249",
+  appId: "1:756445276249:web:0989f661c0b97ef34be948"
+};
+const LOGIN_PAGE = "heineken-pro-v9.html";
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const $ = id => document.getElementById(id);
+const fmt = n => Math.round(Number(n) || 0).toLocaleString("fr-FR");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtDate = t => t ? new Date(t).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
+
+let all = [];
+let filter = "En vérification";
+const busy = new Set();
+
+function toast(msg, err = false) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (err ? " err" : "");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+function renderStats() {
+  const pend = all.filter(r => r.status === "En vérification");
+  const ok = all.filter(r => r.status === "Validé");
+  $("sPend").textContent = pend.length;
+  $("sPendAmt").textContent = fmt(pend.reduce((t, r) => t + (Number(r.amount) || 0), 0)) + " F";
+  $("sOk").textContent = ok.length;
+  $("sTot").textContent = fmt(ok.reduce((t, r) => t + (Number(r.amount) || 0), 0)) + " F";
+  $("cPend").textContent = pend.length;
+  $("cOk").textContent = ok.length;
+  $("cNo").textContent = all.filter(r => r.status === "Annulé").length;
+  $("cWait").textContent = all.filter(r => r.status === "En attente").length;
+}
+
+function renderList() {
+  const list = filter === "Tous" ? all : all.filter(r => r.status === filter);
+  if (!list.length) { $("list").innerHTML = '<div class="empty">Aucune recharge dans cette catégorie.</div>'; return; }
+  $("list").innerHTML = list.map(r => {
+    const k = `${r.userId}|${r.id}`;
+    const isPend = r.status === "En vérification";
+    const cls = r.status === "Validé" ? "ok" : r.status === "Annulé" ? "no" : "";
+    return `
+    <div class="card ${cls === "ok" ? "ok" : cls === "no" ? "no" : ""}">
+      <div class="top">
+        <div class="who">${esc(r.username) || "Utilisateur"}<small>${esc(r.phoneNumber) || esc(r.userId).slice(0, 10)}</small></div>
+        <div class="amt">${fmt(r.amount)} <small>F</small>
+          <div><span class="badge ${cls}">${esc(r.status)}</span></div>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="cell"><span>Opérateur</span><b class="txt">${esc(r.operator) || "—"}</b></div>
+        <div class="cell"><span>Dépôt vers</span><b>${esc(r.depositNumber) || "—"}</b></div>
+        <div class="cell"><span>Numéro de dépôt client</span><b>${esc(r.fromPhone) || "—"}</b></div>
+        <div class="cell"><span>Id transaction</span><b>${esc(r.txId) || "—"}</b></div>
+        <div class="cell wide"><span>Demande créée</span><b class="txt">${fmtDate(r.createdAt)}</b></div>
+        ${r.paidAt ? `<div class="cell wide"><span>Paiement déclaré</span><b class="txt">${fmtDate(r.paidAt)}</b></div>` : ""}
+      </div>
+      ${isPend ? `<div class="actions">
+        <button class="btn no" data-act="reject" data-k="${esc(k)}" ${busy.has(k) ? "disabled" : ""}>Refuser</button>
+        <button class="btn ok" data-act="approve" data-k="${esc(k)}" ${busy.has(k) ? "disabled" : ""}>Valider et créditer</button>
+      </div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function render() { renderStats(); renderList(); }
+
+// Valider : passe la demande en "Validé" puis crédite le solde (une seule fois)
+async function approve(r) {
+  const rref = ref(db, `users/${r.userId}/recharges/${r.id}`);
+  const st = await get(rref);
+  if (!st.exists() || st.val().status !== "En vérification") return "déjà traitée";
+  await update(rref, { status: "Validé", validatedAt: Date.now() });
+  await runTransaction(ref(db, `users/${r.userId}/balance`), b => (b || 0) + Number(r.amount));
+  await runTransaction(ref(db, `users/${r.userId}/totalRecharge`), t => (t || 0) + Number(r.amount));
+  return null;
+}
+
+async function reject(r) {
+  const rref = ref(db, `users/${r.userId}/recharges/${r.id}`);
+  const st = await get(rref);
+  if (!st.exists() || st.val().status !== "En vérification") return "déjà traitée";
+  await update(rref, { status: "Annulé", cancelledAt: Date.now(), rejectedBy: "admin" });
+  return null;
+}
+
+document.addEventListener("click", async e => {
+  const tab = e.target.closest(".tab");
+  if (tab) {
+    filter = tab.dataset.f;
+    document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t === tab));
+    renderList();
+    return;
+  }
+  const btn = e.target.closest("[data-act]");
+  if (!btn) return;
+  const k = btn.dataset.k;
+  const r = all.find(x => `${x.userId}|${x.id}` === k);
+  if (!r || busy.has(k)) return;
+  const approving = btn.dataset.act === "approve";
+  const msg = approving
+    ? `Valider la recharge de ${fmt(r.amount)} F pour ${r.username || r.userId} ? Le solde sera crédité.`
+    : `Refuser la recharge de ${fmt(r.amount)} F pour ${r.username || r.userId} ?`;
+  if (!confirm(msg)) return;
+  busy.add(k); renderList();
+  try {
+    const info = approving ? await approve(r) : await reject(r);
+    if (info) toast(info, true);
+    else {
+      r.status = approving ? "Validé" : "Annulé";
+      toast(approving ? "Recharge validée et créditée." : "Recharge refusée.");
+    }
+  } catch (err) {
+    toast("Erreur : " + err.message, true);
+  } finally {
+    busy.delete(k);
+    render();
+  }
+});
+
+async function loadAll() {
+  const snap = await get(ref(db, "users"));
+  const users = snap.exists() ? snap.val() : {};
+  const out = [];
+  for (const [uid, u] of Object.entries(users)) {
+    const recs = u.recharges || {};
+    for (const [id, r] of Object.entries(recs)) {
+      out.push({ ...r, id, userId: uid, username: u.username, phoneNumber: u.phoneNumber });
+    }
+  }
+  all = out.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  render();
+}
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href = LOGIN_PAGE; return; }
+  try {
+    const flag = await get(ref(db, `users/${user.uid}/isAdmin`));
+    if (flag.val() !== true) {
+      $("list").innerHTML = '<div class="empty">🔒 Accès réservé : ce compte n\'est pas administrateur.</div>';
+      return;
+    }
+    await loadAll();
+  } catch (e) {
+    toast("Erreur de chargement : " + e.message, true);
+  }
+});
+</script>
+</body>
+</html>

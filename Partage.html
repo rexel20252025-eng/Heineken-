@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Heineken — Partage</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#fff;background:radial-gradient(circle at 20% 10%,#14934a 0%,transparent 45%),radial-gradient(circle at 85% 90%,#0a4f20 0%,transparent 50%),linear-gradient(170deg,#00782a 0%,#00602a 60%,#004a20 100%);background-attachment:fixed;min-height:100vh;display:flex;justify-content:center}
+.app{width:100%;max-width:420px;min-height:100vh;padding:22px 16px 110px;position:relative}
+.top{text-align:center;margin-bottom:18px}
+.top .brand{font-size:24px;font-weight:800;letter-spacing:4px}
+.top .brand span{color:#ff3b3b}
+.top .sub{font-size:10px;letter-spacing:3px;opacity:.75;margin-top:4px}
+.page{display:none}
+.page.on{display:block}
+h2{font-size:20px;margin:6px 2px 14px}
+h3{font-size:16px;margin-bottom:6px}
+p{font-size:13px;line-height:1.55;opacity:.9}
+.card{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:18px;margin-bottom:14px}
+.hero{background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.08))}
+.lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;opacity:.8}
+.big{font-size:34px;font-weight:800;margin-top:6px}
+.code{font-size:26px;font-weight:800;letter-spacing:4px;margin:8px 0 12px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.14);font-size:14px}
+.row:last-child{border-bottom:0}
+.row span:first-child{opacity:.75}
+.row span:last-child{font-weight:700;text-align:right;word-break:break-all}
+.product{display:flex;align-items:center;gap:14px}
+.product .thumb{width:56px;height:70px;flex:0 0 56px;background:rgba(255,255,255,.12);border-radius:14px;display:flex;align-items:center;justify-content:center}
+.product .thumb svg{height:56px}
+.product .name{font-weight:800;font-size:16px}
+.product .desc{font-size:12px;opacity:.8;margin-top:3px;line-height:1.4}
+.btn{display:block;width:100%;padding:12px;background:#ff3b3b;color:#fff;border:0;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-top:10px;transition:background .2s,transform .15s}
+.btn:hover{background:#e02a2a}
+.btn:active{transform:scale(.98)}
+.btn.sec{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.4)}
+.btn.sec:hover{background:rgba(255,255,255,.25)}
+.btn.wa{background:#25d366}
+.btn.wa:hover{background:#1ebe5a}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#fff;color:#00602a;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;box-shadow:0 8px 20px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
+.toast.show{opacity:1}
+nav.bottom{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:420px;background:rgba(0,50,22,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.15);display:grid;grid-template-columns:repeat(4,1fr);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:20}
+nav.bottom a{text-decoration:none;background:none;border:0;color:#fff;opacity:.6;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:600;cursor:pointer;padding:6px 0;border-radius:12px;transition:opacity .2s,background .2s}
+nav.bottom a svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.bottom a.on{opacity:1;background:rgba(255,255,255,.12)}
+nav.bottom a.on svg{stroke:#ff3b3b}
+
+.empty{min-height:40vh}
+
+.card{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:18px;margin-bottom:14px}
+.hero{background:linear-gradient(135deg,rgba(255,255,255,.26),rgba(255,255,255,.08) 60%,rgba(215,25,32,.22));border:1px solid rgba(255,255,255,.3);box-shadow:0 14px 30px rgba(0,0,0,.25)}
+.lbl{font-size:11px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;opacity:.85}
+.hero h2{font-size:22px;margin:6px 0 4px;font-weight:900}
+.hero p{font-size:13px;line-height:1.5;opacity:.9}
+.code{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,#ffe9a0,#ffd76a 45%,#f5b82e);color:#3d2500;box-shadow:0 8px 18px rgba(245,184,46,.4)}
+.code .v{font-size:26px;font-weight:900;letter-spacing:4px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.code .c{font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;opacity:.8}
+.link{margin-top:12px;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,.18);font-size:12px;word-break:break-all;line-height:1.4;font-family:ui-monospace,Menlo,Consolas,monospace}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:13px 10px;border:0;border-radius:14px;font-size:14px;font-weight:800;cursor:pointer;color:#00782a;background:linear-gradient(180deg,#ffffff,#eaf5ee);box-shadow:0 6px 14px rgba(0,0,0,.25);text-decoration:none}
+.btn.wa{background:linear-gradient(180deg,#34e07a,#1ebe5a);color:#fff}
+.btn:active{transform:scale(.97)}
+.note{font-size:12px;opacity:.8;margin-top:12px;text-align:center}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.stat{padding:14px 12px;border-radius:16px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);text-align:center}
+.stat .c{font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;opacity:.85}
+.stat .v{font-size:22px;font-weight:900;margin-top:6px}
+.empty-msg{text-align:center;padding:30px 10px;font-size:14px;opacity:.9}
+.explain{margin-top:14px;padding:16px 16px 14px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2)}
+.explain h3{font-size:16px;font-weight:900;margin:0 0 10px}
+.explain .lv{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;margin-bottom:8px;border-radius:14px;background:rgba(255,255,255,.12)}
+.explain .lv b{font-size:15px;font-weight:900;color:#ffd76a}
+.explain .lv span{font-size:13px;font-weight:700}
+.explain p{font-size:13px;line-height:1.55;margin-top:10px;opacity:.95}
+.explain .ex{margin-top:12px;padding:12px;border-radius:14px;background:linear-gradient(135deg,#ffe9a0,#ffd76a 45%,#f5b82e);color:#3d2500;font-size:13px;line-height:1.5}
+.lvl-detail{margin-top:12px;display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:1.5}
+.lvl-detail b{color:#ffd76a}
+.explain .step{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;font-size:14px;line-height:1.45}
+.explain .step .n{flex:0 0 28px;height:28px;border-radius:50%;background:#ffd76a;color:#3d2500;font-weight:900;display:flex;align-items:center;justify-content:center;font-size:13px}
+.explain .levels{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.explain .lv span small{display:block;font-size:11px;font-weight:600;opacity:.8;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">HEINEKEN<span>★</span></div>
+    <div class="sub">LÀ BOISSONS · PURE MALT LAGER</div>
+  </header>
+
+  <section class="page on">
+    <div class="card hero">
+      <div class="lbl">Parrainage</div>
+      <h2>Invitez vos amis</h2>
+      <p>Partagez votre code ou votre lien. Vos amis s'inscrivent avec votre code de parrainage.</p>
+      <div id="content"><div class="empty-msg">Chargement de votre code…</div></div>
+    </div>
+
+    <div class="explain">
+      <h3>Comment gagner ?</h3>
+      <div class="step"><span class="n">1</span><div><b>Invitez</b><br>Partagez votre code ou votre lien.</div></div>
+      <div class="step"><span class="n">2</span><div><b>Ils investissent</b><br>Vous gagnez une commission sur leur investissement.</div></div>
+      <div class="step"><span class="n">3</span><div><b>Vous êtes payé</b><br>L'argent arrive sur votre solde tout de suite.</div></div>
+
+      <div class="levels">
+        <div class="lv"><span>Nouveau 1<small>invité par vous</small></span><b>10 %</b></div>
+        <div class="lv"><span>Nouveau 2<small>invité par vos Nouveau 1</small></span><b>5 %</b></div>
+        <div class="lv"><span>Nouveau 3<small>invité par vos Nouveau 2</small></span><b>2 %</b></div>
+      </div>
+
+      <div class="ex"><b>Exemple :</b> investissement de 5.500 F<br>Nouveau 1 → 550 F · Nouveau 2 → 275 F · Nouveau 3 → 110 F</div>
+    </div>
+  </section>
+</div>
+
+<nav class="bottom">
+  <a href="accueil.html">
+    <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+    Accueil
+  </a>
+  <a href="boissons.html">
+    <svg viewBox="0 0 24 24"><path d="M8 3h8l-1 5a4 4 0 0 1-6 0z"/><path d="M9 12v8h6v-8"/><path d="M7 21h10"/></svg>
+    Boissons
+  </a>
+  <a href="partage.html" class="on">
+    <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.6"/><path d="M8.2 13.2l7.6 4.6"/></svg>
+    Partage
+  </a>
+  <a href="compte.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+    Compte
+  </a>
+</nav>
+
+<div class="toast" id="toast"></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import { getDatabase, ref, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAVNLSc3JXWvTxiKk2n-mjmVUv39a_yuVM",
+  authDomain: "heineken-c174e.firebaseapp.com",
+  databaseURL: "https://heineken-c174e-default-rtdb.firebaseio.com",
+  projectId: "heineken-c174e",
+  storageBucket: "heineken-c174e.firebasestorage.app",
+  messagingSenderId: "756445276249",
+  appId: "1:756445276249:web:0989f661c0b97ef34be948"
+};
+const LOGIN_PAGE = "heineken-pro-v9.html";
+const SIGNUP_PAGE = "heineken-pro-v9.html";
+const LEVEL_PCT = [10, 5, 2];
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const $ = id => document.getElementById(id);
+
+function toast(t) {
+  const el = $("toast");
+  el.textContent = t;
+  el.classList.add("show");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove("show"), 2200);
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+const fmt = n => Math.round(Number(n) || 0).toLocaleString("fr-FR");
+
+// Filleuls par niveau : niveau 1 = parrainés directs, niveau 2 et 3 = leurs filleuls
+let usersCache = null;
+async function childrenOf(uid) {
+  // 1) requête indexée ; 2) si l'index manque, on lit les comptes et on filtre
+  try {
+    const snap = await get(query(ref(db, "users"), orderByChild("referredBy"), equalTo(uid)));
+    return snap.exists() ? Object.keys(snap.val()) : [];
+  } catch (e) {
+    if (!usersCache) {
+      const all = await get(ref(db, "users"));
+      usersCache = all.exists() ? all.val() : {};
+    }
+    return Object.keys(usersCache).filter(k => usersCache[k] && usersCache[k].referredBy === uid);
+  }
+}
+async function loadStats(uid) {
+  usersCache = null;
+  const l1 = await childrenOf(uid);
+  const l2 = [];
+  for (const c of l1) l2.push(...await childrenOf(c));
+  const l3 = [];
+  for (const c of l2) l3.push(...await childrenOf(c));
+  const com = await get(ref(db, `users/${uid}/commissions`));
+  let total = 0;
+  if (com.exists()) for (const c of Object.values(com.val())) total += Number(c.amount) || 0;
+  return { levels: [l1.length, l2.length, l3.length], total };
+}
+
+function statsHtml(st) {
+  if (!st) return `<div class="note">Les statistiques n'ont pas pu être chargées. Réessayez plus tard.</div>`;
+  const { levels, total } = st;
+  return `
+    <div class="stats">
+      <div class="stat"><div class="c">Nouveau 1 · ${LEVEL_PCT[0]}%</div><div class="v">${levels[0]}</div></div>
+      <div class="stat"><div class="c">Nouveau 2 · ${LEVEL_PCT[1]}%</div><div class="v">${levels[1]}</div></div>
+      <div class="stat"><div class="c">Nouveau 3 · ${LEVEL_PCT[2]}%</div><div class="v">${levels[2]}</div></div>
+      <div class="stat"><div class="c">Commissions gagnées</div><div class="v">${fmt(total)} F</div></div>
+    </div>
+    <div class="note">Vous gagnez une commission sur chaque investissement de vos filleuls.</div>`;
+}
+
+function showCode(code, stats) {
+  const link = new URL(`${SIGNUP_PAGE}?ref=${encodeURIComponent(code)}`, window.location.href).href;
+  const msg = `Rejoignez Là Boissons Heineken avec mon code de parrainage ${code} : ${link}`;
+  $("content").innerHTML = `
+    <div class="code"><div><div class="c">Votre code</div><div class="v">${esc(code)}</div></div></div>
+    <div class="link" id="linkTxt">${esc(link)}</div>
+    <div class="btns">
+      <button class="btn" id="copyBtn" type="button">📋 Copier le lien</button>
+      <a class="btn wa" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">💬 WhatsApp</a>
+    </div>
+    <div class="btns" style="grid-template-columns:1fr">
+      <button class="btn" id="shareBtn" type="button">↗ Partager</button>
+    </div>
+    ${statsHtml(stats)}`;
+
+  $("copyBtn").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(link);
+      toast("Lien copié");
+    } catch (e) {
+      toast("Copie impossible sur cet appareil");
+    }
+  });
+  $("shareBtn").addEventListener("click", async () => {
+    if (navigator.share) {
+      try { await navigator.share({ title: "Là Boissons Heineken", text: msg, url: link }); } catch (e) {}
+    } else {
+      toast("Partage non disponible : utilisez Copier ou WhatsApp");
+    }
+  });
+}
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href = LOGIN_PAGE; return; }
+  try {
+    const snap = await get(ref(db, `users/${user.uid}/referralCode`));
+    if (snap.exists()) {
+      let stats = { levels: [0, 0, 0], total: 0 };
+      try {
+        stats = await loadStats(user.uid);
+      } catch (e) {
+        console.error('Statistiques parrainage :', e);
+        stats = null;
+      }
+      showCode(snap.val(), stats);
+    } else {
+      $("content").innerHTML = '<div class="empty-msg">Aucun code de parrainage trouvé pour ce compte.</div>';
+    }
+  } catch (e) {
+    $("content").innerHTML = `<div class="empty-msg">Erreur de chargement : ${esc(e.message)}</div>`;
+  }
+});
+</script>
+</body>
+</html>

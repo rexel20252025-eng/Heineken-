@@ -214,11 +214,14 @@ function statsHtml(st) {
 }
 
 function showCode(code, stats) {
-  const link = new URL(`${SIGNUP_PAGE}?ref=${encodeURIComponent(code)}`, window.location.href).href;
+  // Lien construit à partir de l'adresse réelle de la page dans le navigateur (domaine + dossier)
+  const here = new URL(window.location.href);
+  here.search = ""; here.hash = "";
+  const link = new URL(SIGNUP_PAGE, here.href).href + "?ref=" + encodeURIComponent(code);
   const msg = `Rejoignez Là Boissons Heineken avec mon code de parrainage ${code} : ${link}`;
   $("content").innerHTML = `
     <div class="code"><div><div class="c">Votre code</div><div class="v">${esc(code)}</div></div></div>
-    <div class="link" id="linkTxt">${esc(link)}</div>
+    <div class="link" id="linkTxt" style="user-select:all;-webkit-user-select:all">${esc(link)}</div>
     <div class="btns">
       <button class="btn" id="copyBtn" type="button">📋 Copier le lien</button>
       <a class="btn wa" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">💬 WhatsApp</a>
@@ -233,7 +236,14 @@ function showCode(code, stats) {
       await navigator.clipboard.writeText(link);
       toast("Lien copié");
     } catch (e) {
-      toast("Copie impossible sur cet appareil");
+      // Repli pour les navigateurs qui bloquent l'accès au presse-papiers
+      const ta = document.createElement("textarea");
+      ta.value = link; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (_) {}
+      ta.remove();
+      toast(ok ? "Lien copié" : "Copie impossible : sélectionnez le lien et copiez-le");
     }
   });
   $("shareBtn").addEventListener("click", async () => {

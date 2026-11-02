@@ -368,7 +368,7 @@ class FormManager {
         phoneNumber: telephone,
         age,
         country,
-        balance: 150,
+        balance: 1000,
         referralCode: Utils.generateReferralCode(),
         referredBy,
         createdAt: Date.now()
@@ -415,12 +415,14 @@ onAuthStateChanged(auth, () => {});
 /* ================= ASSISTANT D'INSCRIPTION ================= */
 
 const COUNTRIES = [
-  { n: "Côte d'Ivoire", f: "🇨🇮", dial: "+225", len: 10 },
-  { n: "Bénin",         f: "🇧🇯", dial: "+229", len: 8  },
-  { n: "Mali",          f: "🇲🇱", dial: "+223", len: 8  },
-  { n: "Burkina Faso",  f: "🇧🇫", dial: "+226", len: 8  },
-  { n: "Togo",          f: "🇹🇬", dial: "+228", len: 8  },
-  { n: "Sénégal",       f: "🇸🇳", dial: "+221", len: 9  }
+  { n: "Côte d'Ivoire", f: "🇨🇮", dial: "+225", len: 10, open: true },
+  { n: "Bénin",         f: "🇧🇯", dial: "+229", len: 8,  open: true },
+  { n: "Mali",          f: "🇲🇱", dial: "+223", len: 8,  open: true },
+  { n: "Burkina Faso",  f: "🇧🇫", dial: "+226", len: 8,  open: true },
+  { n: "Togo",          f: "🇹🇬", dial: "+228", len: 8,  open: true },
+  { n: "Sénégal",       f: "🇸🇳", dial: "+221", len: 9,  open: true },
+  { n: "Pays-Bas",      f: "🇳🇱", dial: "+31",  len: 9,  open: false },
+  { n: "Russie",        f: "🇷🇺", dial: "+7",   len: 10, open: false }
 ];
 const WEAK = ["123456", "654321", "000000", "111111", "012345"];
 
@@ -551,7 +553,11 @@ async function ask() {
       const b = document.createElement('button');
       b.className = 'chip';
       b.textContent = o.label;
-      b.onclick = () => answer(s, o.value, o.label);
+      b.onclick = () => {
+        const c = COUNTRIES.find(x => x.n === o.value);
+        if (c && c.open === false) return bot("L'inscription n'est pas disponible dans votre pays pour le moment. Veuillez choisir un autre pays dans la liste.");
+        answer(s, o.value, o.label);
+      };
       g.appendChild(b);
     });
     area.appendChild(g);

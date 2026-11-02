@@ -170,6 +170,28 @@ nav.bottom a.on svg{stroke:#ff3b3b}
 .palette .ptotal b{font-size:22px;font-weight:900;letter-spacing:.3px;color:#3d2500}
 .ratio .shield{position:absolute;inset:0;z-index:2;background:transparent;cursor:default}
 .action,.action:hover,.action:visited{text-decoration:none!important}
+
+/* ---------- Cartes boisson : style clair (v2) ---------- */
+.palette.v2{display:flex;flex-wrap:wrap;align-items:center;gap:14px;position:relative;overflow:hidden;background:#fff;border:0;border-top:4px solid #0f7a33;border-radius:22px;padding:18px;margin-bottom:16px;box-shadow:0 12px 28px rgba(15,60,35,.12);color:#0d2a18}
+.palette.v2::before{display:none}
+.palette.v2 .pico{flex:0 0 66px;width:66px;height:78px;border-radius:16px;background:#eaf6ef;box-shadow:none}
+.palette.v2 .pico svg{height:66px;width:auto}
+.palette.v2 .pinfo{flex:1;min-width:0}
+.palette.v2 .pname{font-family:"Playfair Display",Georgia,serif;font-size:22px;font-weight:900;color:#0d2a18;margin:0 0 8px;text-shadow:none;letter-spacing:.2px}
+.palette.v2 .prow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed #dbe6df;font-size:13px;color:#0d2a18}
+.palette.v2 .prow:last-of-type{border-bottom:0}
+.palette.v2 .prow span{color:#6b8070;font-weight:600;opacity:1}
+.palette.v2 .prow b{color:#0d2a18;font-weight:800}
+.palette.v2 .prow:nth-of-type(3){margin:0;padding:7px 0;border-radius:0;background:none;border-left:0;border-right:0;border-top:0;border-bottom:1px dashed #dbe6df}
+.palette.v2 .prow:nth-of-type(3) span{color:#6b8070;font-weight:600}
+.palette.v2 .prow:nth-of-type(3) b{color:#0d2a18;font-size:13px;text-shadow:none}
+.palette.v2 .ptotal{width:100%;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;margin:10px 0 0;padding:11px 14px;border-radius:14px;background:linear-gradient(135deg,#0f7a33,#25b96a);color:#fff;box-shadow:0 8px 18px rgba(15,122,51,.28);text-align:left;gap:2px;min-width:0}
+.palette.v2 .ptotal span{font-size:12px;font-weight:700;letter-spacing:.2px;text-transform:none;color:#e6fff0;opacity:1}
+.palette.v2 .ptotal b{font-size:20px;font-weight:900;color:#fff;white-space:nowrap;font-variant-numeric:tabular-nums}
+.palette.v2 .pstatus{top:16px;right:16px;background:#e9f9ef;color:#00602a;border:1px solid #a0ddb8;box-shadow:none;font-size:11px;font-weight:800;padding:4px 10px;text-transform:none;letter-spacing:.2px}
+.palette.v2 .pbtn{width:100%;flex:1 1 100%;margin:12px 0 0;padding:14px;border-radius:14px;background:linear-gradient(135deg,#0f7a33,#25b96a);color:#fff;font-size:15px;font-weight:800;letter-spacing:.3px;text-transform:none;box-shadow:0 10px 20px rgba(15,122,51,.3)}
+.palette.v2 .pbtn:disabled{background:#e7ece9;color:#4b6353;box-shadow:none}
+.palette.v2.invested{opacity:1}
 </style>
 </head>
 <body>
@@ -218,7 +240,7 @@ nav.bottom a.on svg{stroke:#ff3b3b}
     </div>
     <div class="invest-head"><h2>Investissements</h2><span>6 boissons</span></div>
     <div class="once-note">Chaque boisson ne peut être investie qu'une seule fois. Vous pouvez investir dans plusieurs boissons différentes.</div>
-    <div class="palette" data-name="Boisson 1" data-prix="5.500F" data-benef="950F" data-cycle="19 jours" data-total="18.050F" data-id="1" data-price="5500" data-benefit="950" data-days="19" data-total-num="18050">
+    <div class="palette v2" data-name="Boisson 1" data-prix="5.500F" data-benef="950F" data-cycle="19 jours" data-total="18.050F" data-id="1" data-price="5500" data-benefit="950" data-days="19" data-total-num="18050">
       <div class="pico"><svg viewBox="0 0 120 340" aria-hidden="true"><rect x="41" y="0" width="38" height="24" rx="4" fill="#2fbf5e"/><path d="M46 25H74V42Q74 76 91 98Q96 106 95 128V318Q95 332 81 332H39Q25 332 25 318V128Q24 106 29 98Q46 76 46 42Z" fill="#0f7a33"/><rect x="24" y="176" width="72" height="108" rx="3" fill="#fff"/><polygon points="60,191 63.2,200.6 73.3,200.7 65.2,206.7 68.2,216.3 60,210.5 51.8,216.3 54.8,206.7 46.7,200.7 56.8,200.6" fill="#d71920"/></svg></div>
       <div class="pinfo">
         <div class="pname">Heineken 1</div>
@@ -230,7 +252,7 @@ nav.bottom a.on svg{stroke:#ff3b3b}
       <span class="pstatus">Loué</span>
       <button class="pbtn">Louer</button>
     </div>
-    <div class="palette" data-name="Boisson 2" data-prix="12.500F" data-benef="2.500F" data-cycle="18 jours" data-total="45.000F" data-id="2" data-price="12500" data-benefit="2500" data-days="18" data-total-num="45000">
+    <div class="palette v2" data-name="Boisson 2" data-prix="12.500F" data-benef="2.500F" data-cycle="18 jours" data-total="45.000F" data-id="2" data-price="12500" data-benefit="2500" data-days="18" data-total-num="45000">
       <div class="pico"><svg viewBox="0 0 120 340" aria-hidden="true"><rect x="41" y="0" width="38" height="24" rx="4" fill="#2fbf5e"/><path d="M46 25H74V42Q74 76 91 98Q96 106 95 128V318Q95 332 81 332H39Q25 332 25 318V128Q24 106 29 98Q46 76 46 42Z" fill="#0f7a33"/><rect x="24" y="176" width="72" height="108" rx="3" fill="#fff"/><polygon points="60,191 63.2,200.6 73.3,200.7 65.2,206.7 68.2,216.3 60,210.5 51.8,216.3 54.8,206.7 46.7,200.7 56.8,200.6" fill="#d71920"/></svg></div>
       <div class="pinfo">
         <div class="pname">Heineken 2</div>
@@ -242,7 +264,7 @@ nav.bottom a.on svg{stroke:#ff3b3b}
       <span class="pstatus">Loué</span>
       <button class="pbtn">Louer</button>
     </div>
-    <div class="palette" data-name="Boisson 3" data-prix="30.500F" data-benef="5.000F" data-cycle="15 jours" data-total="75.000F" data-id="3" data-price="30500" data-benefit="5000" data-days="15" data-total-num="75000">
+    <div class="palette v2" data-name="Boisson 3" data-prix="30.500F" data-benef="5.000F" data-cycle="15 jours" data-total="75.000F" data-id="3" data-price="30500" data-benefit="5000" data-days="15" data-total-num="75000">
       <div class="pico"><svg viewBox="0 0 120 340" aria-hidden="true"><rect x="41" y="0" width="38" height="24" rx="4" fill="#2fbf5e"/><path d="M46 25H74V42Q74 76 91 98Q96 106 95 128V318Q95 332 81 332H39Q25 332 25 318V128Q24 106 29 98Q46 76 46 42Z" fill="#0f7a33"/><rect x="24" y="176" width="72" height="108" rx="3" fill="#fff"/><polygon points="60,191 63.2,200.6 73.3,200.7 65.2,206.7 68.2,216.3 60,210.5 51.8,216.3 54.8,206.7 46.7,200.7 56.8,200.6" fill="#d71920"/></svg></div>
       <div class="pinfo">
         <div class="pname">Heineken 3</div>
@@ -254,7 +276,7 @@ nav.bottom a.on svg{stroke:#ff3b3b}
       <span class="pstatus">Loué</span>
       <button class="pbtn">Louer</button>
     </div>
-    <div class="palette" data-name="Boisson 4" data-prix="50.500F" data-benef="10.000F" data-cycle="15 jours" data-total="150.000F" data-id="4" data-price="50500" data-benefit="10000" data-days="15" data-total-num="150000">
+    <div class="palette v2" data-name="Boisson 4" data-prix="50.500F" data-benef="10.000F" data-cycle="15 jours" data-total="150.000F" data-id="4" data-price="50500" data-benefit="10000" data-days="15" data-total-num="150000">
       <div class="pico"><svg viewBox="0 0 120 340" aria-hidden="true"><rect x="41" y="0" width="38" height="24" rx="4" fill="#2fbf5e"/><path d="M46 25H74V42Q74 76 91 98Q96 106 95 128V318Q95 332 81 332H39Q25 332 25 318V128Q24 106 29 98Q46 76 46 42Z" fill="#0f7a33"/><rect x="24" y="176" width="72" height="108" rx="3" fill="#fff"/><polygon points="60,191 63.2,200.6 73.3,200.7 65.2,206.7 68.2,216.3 60,210.5 51.8,216.3 54.8,206.7 46.7,200.7 56.8,200.6" fill="#d71920"/></svg></div>
       <div class="pinfo">
         <div class="pname">Heineken 4</div>
@@ -266,7 +288,7 @@ nav.bottom a.on svg{stroke:#ff3b3b}
       <span class="pstatus">Loué</span>
       <button class="pbtn">Louer</button>
     </div>
-    <div class="palette" data-name="Boisson 5" data-prix="100.000F" data-benef="25.000F" data-cycle="15 jours" data-total="375.000F" data-id="5" data-price="100000" data-benefit="25000" data-days="15" data-total-num="375000">
+    <div class="palette v2" data-name="Boisson 5" data-prix="100.000F" data-benef="25.000F" data-cycle="15 jours" data-total="375.000F" data-id="5" data-price="100000" data-benefit="25000" data-days="15" data-total-num="375000">
       <div class="pico"><svg viewBox="0 0 120 340" aria-hidden="true"><rect x="41" y="0" width="38" height="24" rx="4" fill="#2fbf5e"/><path d="M46 25H74V42Q74 76 91 98Q96 106 95 128V318Q95 332 81 332H39Q25 332 25 318V128Q24 106 29 98Q46 76 46 42Z" fill="#0f7a33"/><rect x="24" y="176" width="72" height="108" rx="3" fill="#fff"/><polygon points="60,191 63.2,200.6 73.3,200.7 65.2,206.7 68.2,216.3 60,210.5 51.8,216.3 54.8,206.7 46.7,200.7 56.8,200.6" fill="#d71920"/></svg></div>
       <div class="pinfo">
         <div class="pname">Heineken 5</div>
@@ -278,7 +300,7 @@ nav.bottom a.on svg{stroke:#ff3b3b}
       <span class="pstatus">Loué</span>
       <button class="pbtn">Louer</button>
     </div>
-    <div class="palette" data-name="Boisson 6" data-prix="150.000F" data-benef="36.740F" data-cycle="15 jours" data-total="551.100F" data-id="6" data-price="150000" data-benefit="36740" data-days="15" data-total-num="551100">
+    <div class="palette v2" data-name="Boisson 6" data-prix="150.000F" data-benef="36.740F" data-cycle="15 jours" data-total="551.100F" data-id="6" data-price="150000" data-benefit="36740" data-days="15" data-total-num="551100">
       <div class="pico"><svg viewBox="0 0 120 340" aria-hidden="true"><rect x="41" y="0" width="38" height="24" rx="4" fill="#2fbf5e"/><path d="M46 25H74V42Q74 76 91 98Q96 106 95 128V318Q95 332 81 332H39Q25 332 25 318V128Q24 106 29 98Q46 76 46 42Z" fill="#0f7a33"/><rect x="24" y="176" width="72" height="108" rx="3" fill="#fff"/><polygon points="60,191 63.2,200.6 73.3,200.7 65.2,206.7 68.2,216.3 60,210.5 51.8,216.3 54.8,206.7 46.7,200.7 56.8,200.6" fill="#d71920"/></svg></div>
       <div class="pinfo">
         <div class="pname">Heineken 6</div>

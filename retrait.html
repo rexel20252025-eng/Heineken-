@@ -334,12 +334,16 @@ function renderInvestGate() {
   const btn = $("goBtn");
   if (hasInvested) {
     note.style.display = "none";
-    if (btn) btn.disabled = !hasPayout;
+    updateGoBtn();
     return;
   }
   note.style.display = "block";
   note.innerHTML = `<div class="bk">Retrait bloqué</div><div class="bt">Vous devez d'abord investir dans une boisson avant de pouvoir faire un retrait.</div><div class="bt"><a href="accueil.html" style="color:#ffd76a;font-weight:900">Aller investir</a></div>`;
-  if (btn) btn.disabled = true;
+  updateGoBtn();
+}
+function updateGoBtn() {
+  const b = $("goBtn");
+  if (b) b.disabled = !(hasInvested && hasPayout);
 }
 const bonusExpiredNow = () => !!bonus && bonus.status === "active" && Number.isFinite(Number(bonus.expiresAt)) && Date.now() >= Number(bonus.expiresAt);
 const bonusActive = () => !!bonus && bonus.status === "active" && !bonusExpiredNow();
@@ -422,8 +426,9 @@ onAuthStateChanged(auth, user => {
     } else {
       hasPayout = false;
       note.innerHTML = `Avant de retirer, <a href="compte-retrait.html" style="color:#ffd76a;font-weight:900">complétez votre compte de retrait</a> : nom, opérateur, numéro et code de retrait.`;
-      $("goBtn").disabled = true;
+      updateGoBtn();
     }
+    updateGoBtn();
   });
   onValue(ref(db, `users/${uid}/balance`), snap => {
     balance = Number(snap.val()) || 0;
@@ -526,7 +531,7 @@ $("goBtn").addEventListener("click", async () => {
   } catch (e) {
     setErr("Erreur : " + e.message);
   } finally {
-    btn.disabled = false;
+    updateGoBtn();
   }
 });
 </script>

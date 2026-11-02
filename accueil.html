@@ -86,6 +86,9 @@ nav.bottom a.on svg{stroke:#ff3b3b}
 .pbtn{flex:1 1 100%;margin-top:4px;padding:11px;border:0;border-radius:12px;background:linear-gradient(180deg,#ffffff,#eaf5ee);color:#00782a;font-size:14px;font-weight:800;letter-spacing:.4px;cursor:pointer;box-shadow:0 6px 14px rgba(0,0,0,.25);transition:transform .15s,filter .2s}
 .pbtn:hover{filter:brightness(1.04)}
 .pbtn:active{transform:scale(.97)}
+.once-note{margin:-4px 2px 14px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.14);border:1px solid rgba(255,235,170,.55);color:#fff7de;font-size:12px;font-weight:700;line-height:1.5}
+.pbtn:disabled{opacity:.55;cursor:default;background:linear-gradient(180deg,#e7ece9,#d5ddd8);color:#4b6353}
+.palette.invested{opacity:.92}
 .overlay{position:fixed;inset:0;background:rgba(0,30,12,.6);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
 .overlay.show{display:flex}
 .rmodal{background:linear-gradient(160deg,#00923a,#00602a);border:1px solid rgba(255,255,255,.25);border-radius:22px;padding:22px 20px;width:100%;max-width:340px;box-shadow:0 24px 50px rgba(0,0,0,.45);color:#fff}
@@ -187,7 +190,7 @@ nav.bottom a.on svg{stroke:#ff3b3b}
     </div>
   </section>
   <section class="actions">
-    <a class="action" href="recharge.html">
+    <a class="action" href="depot.html">
       <span class="ico"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></span>
       <span>Dépôt</span>
     </a>
@@ -213,8 +216,9 @@ nav.bottom a.on svg{stroke:#ff3b3b}
       </div>
       <div class="bigbal"><span id="main-balance">—</span> F</div>
     </div>
-    <div class="invest-head"><h2>Investissements</h2><span>6 palettes</span></div>
-    <div class="palette" data-name="Heineken 1" data-prix="5.500F" data-benef="950F" data-cycle="19 jours" data-total="18.050F" data-id="1" data-price="5500" data-benefit="950" data-days="19" data-total-num="18050">
+    <div class="invest-head"><h2>Investissements</h2><span>6 boissons</span></div>
+    <div class="once-note">Chaque boisson ne peut être investie qu'une seule fois. Vous pouvez investir dans plusieurs boissons différentes.</div>
+    <div class="palette" data-name="Boisson 1" data-prix="5.500F" data-benef="950F" data-cycle="19 jours" data-total="18.050F" data-id="1" data-price="5500" data-benefit="950" data-days="19" data-total-num="18050">
       <div class="pico"><svg viewBox="0 0 120 340" aria-hidden="true"><rect x="41" y="0" width="38" height="24" rx="4" fill="#2fbf5e"/><path d="M46 25H74V42Q74 76 91 98Q96 106 95 128V318Q95 332 81 332H39Q25 332 25 318V128Q24 106 29 98Q46 76 46 42Z" fill="#0f7a33"/><rect x="24" y="176" width="72" height="108" rx="3" fill="#fff"/><polygon points="60,191 63.2,200.6 73.3,200.7 65.2,206.7 68.2,216.3 60,210.5 51.8,216.3 54.8,206.7 46.7,200.7 56.8,200.6" fill="#d71920"/></svg></div>
       <div class="pinfo">
         <div class="pname">Heineken 1</div>
@@ -226,7 +230,7 @@ nav.bottom a.on svg{stroke:#ff3b3b}
       <span class="pstatus">Loué</span>
       <button class="pbtn">Louer</button>
     </div>
-    <div class="palette" data-name="Heineken 2" data-prix="12.500F" data-benef="2.500F" data-cycle="18 jours" data-total="45.000F" data-id="2" data-price="12500" data-benefit="2500" data-days="18" data-total-num="45000">
+    <div class="palette" data-name="Boisson 2" data-prix="12.500F" data-benef="2.500F" data-cycle="18 jours" data-total="45.000F" data-id="2" data-price="12500" data-benefit="2500" data-days="18" data-total-num="45000">
       <div class="pico"><svg viewBox="0 0 120 340" aria-hidden="true"><rect x="41" y="0" width="38" height="24" rx="4" fill="#2fbf5e"/><path d="M46 25H74V42Q74 76 91 98Q96 106 95 128V318Q95 332 81 332H39Q25 332 25 318V128Q24 106 29 98Q46 76 46 42Z" fill="#0f7a33"/><rect x="24" y="176" width="72" height="108" rx="3" fill="#fff"/><polygon points="60,191 63.2,200.6 73.3,200.7 65.2,206.7 68.2,216.3 60,210.5 51.8,216.3 54.8,206.7 46.7,200.7 56.8,200.6" fill="#d71920"/></svg></div>
       <div class="pinfo">
         <div class="pname">Heineken 2</div>
@@ -238,7 +242,7 @@ nav.bottom a.on svg{stroke:#ff3b3b}
       <span class="pstatus">Loué</span>
       <button class="pbtn">Louer</button>
     </div>
-    <div class="palette" data-name="Heineken 3" data-prix="30.500F" data-benef="5.000F" data-cycle="15 jours" data-total="75.000F" data-id="3" data-price="30500" data-benefit="5000" data-days="15" data-total-num="75000">
+    <div class="palette" data-name="Boisson 3" data-prix="30.500F" data-benef="5.000F" data-cycle="15 jours" data-total="75.000F" data-id="3" data-price="30500" data-benefit="5000" data-days="15" data-total-num="75000">
       <div class="pico"><svg viewBox="0 0 120 340" aria-hidden="true"><rect x="41" y="0" width="38" height="24" rx="4" fill="#2fbf5e"/><path d="M46 25H74V42Q74 76 91 98Q96 106 95 128V318Q95 332 81 332H39Q25 332 25 318V128Q24 106 29 98Q46 76 46 42Z" fill="#0f7a33"/><rect x="24" y="176" width="72" height="108" rx="3" fill="#fff"/><polygon points="60,191 63.2,200.6 73.3,200.7 65.2,206.7 68.2,216.3 60,210.5 51.8,216.3 54.8,206.7 46.7,200.7 56.8,200.6" fill="#d71920"/></svg></div>
       <div class="pinfo">
         <div class="pname">Heineken 3</div>
@@ -250,7 +254,7 @@ nav.bottom a.on svg{stroke:#ff3b3b}
       <span class="pstatus">Loué</span>
       <button class="pbtn">Louer</button>
     </div>
-    <div class="palette" data-name="Heineken 4" data-prix="50.500F" data-benef="10.000F" data-cycle="15 jours" data-total="150.000F" data-id="4" data-price="50500" data-benefit="10000" data-days="15" data-total-num="150000">
+    <div class="palette" data-name="Boisson 4" data-prix="50.500F" data-benef="10.000F" data-cycle="15 jours" data-total="150.000F" data-id="4" data-price="50500" data-benefit="10000" data-days="15" data-total-num="150000">
       <div class="pico"><svg viewBox="0 0 120 340" aria-hidden="true"><rect x="41" y="0" width="38" height="24" rx="4" fill="#2fbf5e"/><path d="M46 25H74V42Q74 76 91 98Q96 106 95 128V318Q95 332 81 332H39Q25 332 25 318V128Q24 106 29 98Q46 76 46 42Z" fill="#0f7a33"/><rect x="24" y="176" width="72" height="108" rx="3" fill="#fff"/><polygon points="60,191 63.2,200.6 73.3,200.7 65.2,206.7 68.2,216.3 60,210.5 51.8,216.3 54.8,206.7 46.7,200.7 56.8,200.6" fill="#d71920"/></svg></div>
       <div class="pinfo">
         <div class="pname">Heineken 4</div>
@@ -262,7 +266,7 @@ nav.bottom a.on svg{stroke:#ff3b3b}
       <span class="pstatus">Loué</span>
       <button class="pbtn">Louer</button>
     </div>
-    <div class="palette" data-name="Heineken 5" data-prix="100.000F" data-benef="25.000F" data-cycle="15 jours" data-total="375.000F" data-id="5" data-price="100000" data-benefit="25000" data-days="15" data-total-num="375000">
+    <div class="palette" data-name="Boisson 5" data-prix="100.000F" data-benef="25.000F" data-cycle="15 jours" data-total="375.000F" data-id="5" data-price="100000" data-benefit="25000" data-days="15" data-total-num="375000">
       <div class="pico"><svg viewBox="0 0 120 340" aria-hidden="true"><rect x="41" y="0" width="38" height="24" rx="4" fill="#2fbf5e"/><path d="M46 25H74V42Q74 76 91 98Q96 106 95 128V318Q95 332 81 332H39Q25 332 25 318V128Q24 106 29 98Q46 76 46 42Z" fill="#0f7a33"/><rect x="24" y="176" width="72" height="108" rx="3" fill="#fff"/><polygon points="60,191 63.2,200.6 73.3,200.7 65.2,206.7 68.2,216.3 60,210.5 51.8,216.3 54.8,206.7 46.7,200.7 56.8,200.6" fill="#d71920"/></svg></div>
       <div class="pinfo">
         <div class="pname">Heineken 5</div>
@@ -274,7 +278,7 @@ nav.bottom a.on svg{stroke:#ff3b3b}
       <span class="pstatus">Loué</span>
       <button class="pbtn">Louer</button>
     </div>
-    <div class="palette" data-name="Heineken 6" data-prix="150.000F" data-benef="36.740F" data-cycle="15 jours" data-total="551.100F" data-id="6" data-price="150000" data-benefit="36740" data-days="15" data-total-num="551100">
+    <div class="palette" data-name="Boisson 6" data-prix="150.000F" data-benef="36.740F" data-cycle="15 jours" data-total="551.100F" data-id="6" data-price="150000" data-benefit="36740" data-days="15" data-total-num="551100">
       <div class="pico"><svg viewBox="0 0 120 340" aria-hidden="true"><rect x="41" y="0" width="38" height="24" rx="4" fill="#2fbf5e"/><path d="M46 25H74V42Q74 76 91 98Q96 106 95 128V318Q95 332 81 332H39Q25 332 25 318V128Q24 106 29 98Q46 76 46 42Z" fill="#0f7a33"/><rect x="24" y="176" width="72" height="108" rx="3" fill="#fff"/><polygon points="60,191 63.2,200.6 73.3,200.7 65.2,206.7 68.2,216.3 60,210.5 51.8,216.3 54.8,206.7 46.7,200.7 56.8,200.6" fill="#d71920"/></svg></div>
       <div class="pinfo">
         <div class="pname">Heineken 6</div>
@@ -375,6 +379,7 @@ const rentPage = document.getElementById('rentpage');
 document.querySelectorAll('.pbtn').forEach(btn => {
   btn.addEventListener('click', e => {
     e.stopPropagation();
+    if (btn.disabled) { toast('Vous avez déjà investi dans cette boisson'); return; }
     const card = btn.closest('.palette');
     current = {
       id: Number(card.dataset.id),
@@ -538,11 +543,11 @@ async function confirmRent() {
   const btn = document.getElementById('rconfirm');
   btn.disabled = true;
   try {
-    // 1) palette déjà louée et encore active ?
+    // 1) boisson déjà investie une fois (active ou terminée) ? Une seule fois par boisson.
     const rs = await get(ref(db, `users/${uid}/rentals`));
     const rentals = rs.exists() ? Object.values(rs.val()) : [];
-    if (rentals.some(r => r.paletteId === current.id && r.endAt > Date.now())) {
-      toast('Cette palette est déjà louée');
+    if (rentals.some(r => r.paletteId === current.id)) {
+      toast('Vous avez déjà investi dans cette boisson');
       return;
     }
 
@@ -584,10 +589,28 @@ async function confirmRent() {
 
 document.getElementById('rconfirm').addEventListener('click', confirmRent);
 
+// Met à jour les cartes : une boisson déjà investie ne peut plus être louée
+function markInvested(rentals) {
+  const done = new Set(rentals.map(r => Number(r.paletteId)));
+  document.querySelectorAll('.palette').forEach(card => {
+    const id = Number(card.dataset.id);
+    const btn = card.querySelector('.pbtn');
+    if (!btn) return;
+    const isDone = done.has(id);
+    btn.disabled = isDone;
+    btn.textContent = isDone ? 'Déjà investi' : 'Louer';
+    card.classList.toggle('invested', isDone);
+  });
+}
+
 onAuthStateChanged(auth, user => {
   if (!user) { window.location.href = LOGIN_PAGE; return; }
   uid = user.uid;
   listenBalance(uid);
+  onValue(ref(db, `users/${uid}/rentals`), snap => {
+    const rentals = snap.exists() ? Object.values(snap.val()) : [];
+    markInvested(rentals);
+  });
 });
 
 
